@@ -730,6 +730,8 @@ class SimpleImage {
             $overlay = new SimpleImage($overlay);
         }
 
+        $overlay->fit_to_width($this->width);
+
         // Convert opacity
         $opacity = $opacity * 100;
 

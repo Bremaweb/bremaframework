@@ -60,6 +60,7 @@ $message = array();
 		$form = PFBC\Form::recover($form_id);
 		$cl = $form->getAttribute("model");
 		$model = new $cl();
+		$table = $model->getTable();
 		if ( $_REQUEST['id'] != "" ){
 			$model->load($_REQUEST['id']);
 		} else {
@@ -83,7 +84,7 @@ $message = array();
 			}
 		}
 
-		$model->arraySet($_REQUEST["{$cl}"]);
+		$model->arraySet($_REQUEST["{$table}"]);
 		if ( $model->save() ){
 			$retVal['success'] = 1;
 			$retVal['id'] = $model->id;

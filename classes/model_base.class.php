@@ -12,12 +12,12 @@ class model_base {
 
 	private $data = array();
 
-	function __construct($_key=""){
+	function __construct($_key="",$isGuid = false){
 		global $db;
 		$this->db = $db;
 
 		if ( $_key != "" )
-			$this->load($_key);
+			$this->load($_key,$isGuid);
 	}
 
 	public function save(){
@@ -36,6 +36,7 @@ class model_base {
 			//$this->data["{$this->key}"] = $this->db->lastid();
 			$retVal = $this->db->lastid();
 			$this->id = $retVal;
+			$this->data["{$this->key}"] = $retVal;
 		}
 
 		$this->afterSave();
@@ -53,13 +54,11 @@ class model_base {
 	protected function afterLoad(){ $this->after_load(); }
 	protected function validate() { return true; }
 
-	public function load($keyValue){
-		global $db;
-		if ( ($this->data = $this->db->getRow($this->table, $this->columns, $this->key, $keyValue)) !== false ){
+	public function load($keyValue,$isGuid = false){
+		if ( ($this->data = $this->db->getRow($this->table, $this->columns, ($isGuid == true ? "guid" : $this->key), $keyValue)) !== false ){
 			$this->loaded=true;
 			$this->id = $this->data["{$this->key}"];
 			$this->afterLoad();
-
 			return true;
 		} else {
 			$this->loaded=false;
@@ -145,19 +144,23 @@ class model_base {
 				$attr["{$k}"] = $v;
 			}
 		}
+
+		if ( $attr["class"] == "" )
+			$attr["class"] = "form-control";
+
 		return $attr;
 	}
 
-	public function form(){
+	public function form($ajax=1,$ajaxCallback="saveFormResponse",$action="ajax/saveForm"){
 		global $user;
 		$guid = GUID();
 		$form = new PFBC\Form($guid);
 		$form->configure(array(
 				"prevent" => array("bootstrap", "jQuery"),
-				"ajax" => 1,
-				"ajaxCallback" => "saveFormResponse",
-				"action" => SITE_URL . "ajax/saveForm",
-				"model" => $this->table
+				"ajax" => $ajax,
+				"ajaxCallback" => $ajaxCallback,
+				"action" => SITE_URL . $action,
+				"model" => get_class($this)
 		));
 		$form->addElement(new PFBC\Element\Hidden("guid",$guid));
 		$form->addElement(new PFBC\Element\Hidden("id",$this->id,array("id"=>"id")));

@@ -66,15 +66,14 @@ class user_base extends model_base {
 		debugLog($password);
 		$SQL = "SELECT user_id FROM users WHERE UPPER(" . $this->username_field . ") = '" . $db->escape( strtoupper($username) ) . "' AND user_password = '" . md5($password) . "'";
 		$r = $db->query($SQL);
-		debugLog($SQL);
 		if ( $db->numrows($r) > 0 ){
 			$row = $db->fetchrow($r);
 			$this->load($row['user_id']);
 
 			$_SESSION['user_id'] = $row['user_id'];
 
-				$this->logged_in = true;
-				return true;
+			$this->logged_in = true;
+			return true;
 
 		} else {
 			$this->logged_in = false;
