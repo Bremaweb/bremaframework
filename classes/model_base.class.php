@@ -129,10 +129,14 @@ class model_base {
 	}
 
 	private function element_name($field_name){
-		if ( $this->form_details["$field_name"]['name'] != "" )
+		if ( $this->form_details["$field_name"]['name'] != "" ){
 			return $this->form_details["$field_name"]['name'];
-		else
-			return $this->table . "[" . $field_name . "]";
+		} else {
+			if ( in_array($field_name,$this->columns) )
+				return $this->table . "[" . $field_name . "]";
+			else
+				return $field_name;
+		}
 	}
 
 	private function element_attributes($field_name){
@@ -151,16 +155,19 @@ class model_base {
 		return $attr;
 	}
 
-	public function form($ajax=1,$ajaxCallback="saveFormResponse",$action="ajax/saveForm"){
+	public function form($ajax=1,$ajaxCallback="saveFormResponse",$action="ajax/saveForm",$view="SideBySide",$view_config=array()){
 		global $user;
+
 		$guid = GUID();
 		$form = new PFBC\Form($guid);
+		$view = "PFBC\\View\\" . $view;
 		$form->configure(array(
 				"prevent" => array("bootstrap", "jQuery"),
 				"ajax" => $ajax,
 				"ajaxCallback" => $ajaxCallback,
 				"action" => SITE_URL . $action,
-				"model" => get_class($this)
+				"model" => get_class($this),
+				"view" => new $view($view_config)
 		));
 		$form->addElement(new PFBC\Element\Hidden("guid",$guid));
 		$form->addElement(new PFBC\Element\Hidden("id",$this->id,array("id"=>"id")));

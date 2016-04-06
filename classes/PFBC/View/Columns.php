@@ -1,8 +1,9 @@
 <?php
 namespace PFBC\View;
 
-class SideBySide extends \PFBC\View {
+class Columns extends \PFBC\View {
 	protected $class = "form-horizontal";
+	public $columns;
 
 	public function render() {
 		$this->_form->appendAttribute("class", $this->class);
@@ -13,6 +14,13 @@ class SideBySide extends \PFBC\View {
 		$elements = $this->_form->getElements();
 		$elementSize = sizeof($elements);
 		$elementCount = 0;
+		$_columns = $this->columns;
+		$currentColumn = 0;
+		$columnCounter = 0;
+		// start the first column
+		echo "<div class=\"container\">";
+			echo "<div class=\"row\">";
+				echo "<div class=\"" . $_columns[$currentColumn]['class'] . "\">";
 		for($e = 0; $e < $elementSize; ++$e) {
 			$element = $elements[$e];
 
@@ -30,11 +38,29 @@ class SideBySide extends \PFBC\View {
                     echo '</div>';
             }
             else {
+            	$columnCounter++;
+            	if ( $columnCounter > $_columns[$currentColumn]['count'] ){
+            		echo "</div>"; // close the current column
+            		$currentColumn++;
+
+            		if ( $_columns[$currentColumn]['spacer'] == 1 ){
+            			echo "<div class=\"" . $_columns[$currentColumn]['class'] . "\">";
+            				echo "&nbsp;";
+            			echo "</div>";
+            			$currentColumn++;
+            		}
+
+            		echo "<div class=\"" . $_columns[$currentColumn]['class'] . "\">";	// open the new column
+            		$columnCounter = 0;
+
+            	}
 				echo '<div class="form-group" id="element_', $element->getAttribute('id'), '">', $this->renderLabel($element), '<div class="controls">', $element->render(), $this->renderDescriptions($element), '</div></div>';
 				++$elementCount;
 			}
 		}
-
+				echo "</div>";
+			echo "</div>";
+		echo "</div>";
 		echo '</fieldset></form>';
     }
 

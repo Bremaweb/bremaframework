@@ -15,14 +15,15 @@ abstract class Element extends Base {
 	public function __construct($label, $name, array $properties = null) {
 		$configuration = array(
 			"label" => $label,
-			"name" => $name
+			"name" => $name,
+			"class" => "form-control"
 		);
 
 		/*Merge any properties provided with an associative array containing the label
 		and name properties.*/
 		if(is_array($properties))
 			$configuration = array_merge($configuration, $properties);
-		
+
 		$this->configure($configuration);
 	}
 
@@ -38,7 +39,7 @@ abstract class Element extends Base {
 
 	public function getErrors() {
 		return $this->_errors;
-	}	
+	}
 
 	/*If an element requires external javascript file, this method is used to return an
 	array of entries that will be applied after the form is rendered.*/
@@ -71,7 +72,7 @@ abstract class Element extends Base {
 		return $this->shortDesc;
 	}
 
-	/*The isValid method ensures that the provided value satisfies each of the 
+	/*The isValid method ensures that the provided value satisfies each of the
 	element's validation rules.*/
 	public function isValid($value) {
 		$valid = true;
@@ -88,18 +89,18 @@ abstract class Element extends Base {
 
 			foreach($this->validation as $validation) {
 				if(!$validation->isValid($value)) {
-					/*In the error message, %element% will be replaced by the element's label (or 
+					/*In the error message, %element% will be replaced by the element's label (or
 					name if label is not provided).*/
 					$this->_errors[] = str_replace("%element%", $element, $validation->getMessage());
 					$valid = false;
-				}	
+				}
 			}
 		}
 		return $valid;
 	}
 
 	/*If an element requires jQuery, this method is used to include a section of javascript
-	that will be applied within the jQuery(document).ready(function() {}); section after the 
+	that will be applied within the jQuery(document).ready(function() {}); section after the
 	form has been rendered.*/
 	public function jQueryDocumentReady() {}
 
@@ -122,7 +123,7 @@ abstract class Element extends Base {
         }
 	}
 
-	/*Many of the included elements make use of the <input> tag for display.  These include the Hidden, Textbox, 
+	/*Many of the included elements make use of the <input> tag for display.  These include the Hidden, Textbox,
 	Password, Date, Color, Button, Email, and File element classes.  The project's other element classes will
 	override this method with their own implementation.*/
 	public function render() {
@@ -152,7 +153,7 @@ abstract class Element extends Base {
 	public function setRequired($required) {
 		if(!empty($required))
 			$this->validation[] = new Validation\Required;
-		$this->_attributes["required"] = "";	
+		$this->_attributes["required"] = "";
 	}
 
 	/*This method provides a shortcut for applying the MaxLength validation class to an element.*/
@@ -162,7 +163,7 @@ abstract class Element extends Base {
         $this->_attributes["maxlength"] = $limit;
     }
 
-	/*This method applies one or more validation rules to an element.  If can accept a single concrete 
+	/*This method applies one or more validation rules to an element.  If can accept a single concrete
 	validation class or an array of entries.*/
 	public function setValidation($validation) {
 		/*If a single validation class is provided, an array is created in order to reuse the same logic.*/
@@ -173,8 +174,8 @@ abstract class Element extends Base {
 			if($object instanceof Validation) {
 				$this->validation[] = $object;
 				if($object instanceof Validation\Required)
-					$this->_attributes["required"] = "";	
-			}	
-		}	
+					$this->_attributes["required"] = "";
+			}
+		}
 	}
 }

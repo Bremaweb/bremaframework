@@ -10,6 +10,7 @@ class user_base extends model_base {
 
 	protected $key = "user_id";
 	protected $username_field = "user_name";
+	protected $password_field = null;
 
 	public $data = array();
 
@@ -22,7 +23,7 @@ class user_base extends model_base {
 			session_start();
 			//unset($_SESSION['error']);
 		}
-		$slic = STAY_LOGGED_IN_COOKIE;
+
 		if ( $require_login === true ){
 			$this->authenticate();
 		}
@@ -37,6 +38,7 @@ class user_base extends model_base {
 
 	public function authenticate($required = true){
 		if ( $required == true ){
+			$slic = STAY_LOGGED_IN_COOKIE;
 			if ( $this->logged_in == false && ( !isset($_COOKIE["{$slic}"]) || $_COOKIE["{$slic}"] != $this->user_key ) ){
 				header("location: " . LOGIN_URL . "?redirect=" . $_SERVER['REQUEST_URI']);
 				exit;
@@ -115,6 +117,10 @@ class user_base extends model_base {
 
 	function destruct(){
 		unset($_SESSION['error']);
+	}
+	
+	function getPasswordField(){
+		return $this->password_field;
 	}
 
 }

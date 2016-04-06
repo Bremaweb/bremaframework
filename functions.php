@@ -76,8 +76,8 @@ $message = array();
 			return $retVal;
 		} else {
 			if ( $_REQUEST['password1'] != "" && $_REQUEST['password2'] != "" ){
-				if ( $model->password_field != "" ){
-					$pf = $model->password_field;
+				if ( $model->getPasswordField() != "" ){
+					$pf = $model->getPasswordField();
 					$model->$pf = md5($_REQUEST['password1']);
 					$message[] = "Password updated successfully!";
 				}
