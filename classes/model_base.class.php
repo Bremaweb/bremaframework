@@ -140,11 +140,16 @@ class model_base {
 	}
 
 	private function element_attributes($field_name){
+		global $user;
 		$form_details = $this->form_details;
 		$attr = array();
 		$attr["value"] = ($this->$field_name != "" ? $this->$field_name : $form_details["$field_name"]['default']);
 		if ( is_array($form_details["$field_name"]['attrib']) ){
 			foreach ( $form_details["$field_name"]['attrib'] as $k => $v ){
+				if ( $k == "user_field" ){
+					$k = "value";
+					$v = $user->$v;
+				}
 				$attr["{$k}"] = $v;
 			}
 		}
@@ -155,10 +160,12 @@ class model_base {
 		return $attr;
 	}
 
-	public function form($ajax=1,$ajaxCallback="saveFormResponse",$action="ajax/saveForm",$view="SideBySide",$view_config=array()){
+	public function form($ajax=1,$ajaxCallback="saveFormResponse",$action="ajax/saveForm",$view="SideBySide",$view_config=array(),$guid=false){
 		global $user;
+		$hasButton = false;
+		if ( $guid == false )
+			$guid = GUID();
 
-		$guid = GUID();
 		$form = new PFBC\Form($guid);
 		$view = "PFBC\\View\\" . $view;
 		$form->configure(array(
@@ -178,13 +185,20 @@ class model_base {
 					case "Hidden":
 						$form->addElement(new $el($this->element_name($field_name),($this->$field_name != "" ? $this->$field_name : $attributes['default'])));
 					break;
+					case "Button":
+						$hasButton = true;
+						$form->addElement(new $el($attributes['label'],$attributes['button_type'],$this->element_attributes($field_name)));
+					break;
 					default:
 						$form->addElement(new $el($attributes['label'],$this->element_name($field_name),$this->element_attributes($field_name)));
 					break;
 				}
 			}
 		}
-		$form->addElement(new PFBC\Element\Button);
+
+		if ( $hasButton == false )
+			$form->addElement(new PFBC\Element\Button);
+
 		$form->render();
 	}
 }

@@ -28,7 +28,7 @@ class squeue {
 				echo "<script type=\"text/javascript\" src=\"" . $s . "\"></script>\r\n";
 
 			if ( $this->type == "css" )
-				echo "<link rel=\"stylesheet\" href=\"" . $s . "\" />";
+				echo "<link rel=\"stylesheet\" href=\"" . $s . "\" />\r\n";
 		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 
 function debugLog($text){
-global $appDir;
+
 	if ( DEBUG ){
 		//if ( is_array($text) ){
 		//	ksort($text);
@@ -17,8 +17,8 @@ global $appDir;
 
 		$text = "[" . date("m/d/Y h:ia") . "] " . $text;
 
-			if ( !file_exists("logs") )
-				mkdir("logs");
+			if ( !file_exists(APP_DIR . "/logs") )
+				mkdir(APP_DIR . "/logs");
 
 			$h = fopen(APP_DIR . "/logs/debug_" . date("m-d-Y") . ".txt","a+");
 			fwrite($h, ($text . "\r\n") );
