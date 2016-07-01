@@ -18,6 +18,8 @@ class model_base {
 
 		if ( $_key != "" )
 			$this->load($_key,$isGuid);
+
+		$this->afterConstruct($_key,$isGuid);
 	}
 
 	public function save(){
@@ -53,6 +55,7 @@ class model_base {
 	protected function after_load(){}
 	protected function afterLoad(){ $this->after_load(); }
 	protected function validate() { return true; }
+	protected function afterConstruct($_key,$isGuid) { }
 
 	public function load($keyValue,$isGuid = false){
 		if ( ($this->data = $this->db->getRow($this->table, $this->columns, ($isGuid == true ? "guid" : $this->key), $keyValue)) !== false ){

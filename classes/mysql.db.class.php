@@ -23,7 +23,8 @@ class db {
         }
 		if ( !$this->result ){
 			$errFile = fopen(APP_DIR . "/logs/error_" . date("m-d-Y") . ".txt","a+");
-				fwrite($errFile,"SQL Error: " . mysql_error() . "\r\n" . $SQL . "\r\n\r\n");
+				fwrite($errFile,"[" . date("m/d/Y h:ia") . "] SQL Error: " . mysql_error() . "\r\n" . $SQL . "\r\n\r\n");
+				fwrite($errFile,debug_backtrace());
 			fclose($errFile);
 		}
 		debugLog($this->result);

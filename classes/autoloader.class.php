@@ -6,9 +6,15 @@
         private function loader($className) {
 			global $appDir;
 
-            //echo 'Trying to load ', $className, ' via ', __METHOD__, "()\n";
+            debugLog('Trying to load '. $className . ' via ' . __METHOD__ . "()");
 			if ( $className == "PHPMailer" ){
-				include(BREMA_DIR . "/includes/phpmailer/class.phpmailer.php");
+				debugLog("Loading PHPMailer");
+				$r = require_once(BREMA_DIR . "/phpmailer/class.phpmailer.php");
+				if ( $r === false ){
+					echo BREMA_DIR . "/phpmailer/class.phpmailer.php";
+					die("Unable to load class " . $className . " in Autoloader");
+				}
+				require_once(BREMA_DIR . "/phpmailer/class.smtp.php");
 			} else {
 				$parts = explode("\\",$className);
 
@@ -27,8 +33,6 @@
 					if ( $r === false ){
 						$r = @include(BREMA_DIR . "/classes/" . $className . ".php");
 					}
-
-
 
 				if ( $r === false )
 					die("Unable to load class " . $className);
