@@ -46,6 +46,14 @@ function getMailer(){
 
 }
 
+function cleanURL($str) {
+	$clean = preg_replace("/[^a-zA-Z0-9 ]/", '', $str);
+	$clean = strtolower($clean);
+	$clean = str_replace(array("  "," "),array(" ","-"),$clean);
+
+	return $clean;
+}
+
 function uniqueValue($table,$field,$value){
 	global $db;
 	$SQL = "SELECT $field FROM $table WHERE $field = '" . $db->escape($value) . "'";
