@@ -6,9 +6,9 @@
         private function loader($className) {
 			global $appDir;
 
-            debugLog('Trying to load '. $className . ' via ' . __METHOD__ . "()");
+            //debugLog('Trying to load '. $className . ' via ' . __METHOD__ . "()");
 			if ( $className == "PHPMailer" ){
-				debugLog("Loading PHPMailer");
+				//debugLog("Loading PHPMailer");
 				$r = require_once(BREMA_DIR . "/phpmailer/class.phpmailer.php");
 				if ( $r === false ){
 					echo BREMA_DIR . "/phpmailer/class.phpmailer.php";
