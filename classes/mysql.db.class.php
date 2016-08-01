@@ -14,11 +14,11 @@ class db {
     }
 
     function query($SQL, $displayErrors = true){
-    	debugLog("query($SQL)");
+    	//debugLog("query($SQL)");
         $this->result = @mysql_query($SQL, $this->dbconn);
 
         if ($displayErrors && !$this->result){
-        	debugLog(mysql_error());
+        	//debugLog(mysql_error());
             //echo "SQL Error: " . mysql_error() . "<br><br>" . $SQL . "<br><br>";
         }
 		if ( !$this->result ){
@@ -27,7 +27,7 @@ class db {
 				fwrite($errFile,debug_backtrace());
 			fclose($errFile);
 		}
-		debugLog($this->result);
+		//debugLog($this->result);
         return $this->result;
     }
 
@@ -89,10 +89,10 @@ class db {
 	}
 
     function insertRow($table, $values){
-    	debugLog("insertRow($table,$values);");
-    	debugLog($values);
+    	//debugLog("insertRow($table,$values);");
+    	//debugLog($values);
     	$columns = $this->getTableCols($table);
-    	debugLog($values);
+    	//debugLog($values);
         $SQL = "INSERT INTO $table (";
         $SQLv = "";
         foreach ( $values as $k => $v ){
@@ -110,7 +110,7 @@ class db {
 
         $SQL .= ")";
 
-        debugLog($SQL);
+        //debugLog($SQL);
 
         $results = $this->query($SQL);
         if ( $results )
@@ -134,21 +134,21 @@ class db {
 	}
 
     function updateRow($table,$values,$key,$keyValue="",$columns = ""){
-		debugLog("updateRow();");
-    	debugLog($table);
+		//debugLog("updateRow();");
+    	//debugLog($table);
 
 		if ( $columns == "" )
 			$columns = $this->getTableCols($table);
 
-    	debugLog($values);
-		debugLog($key);
-		debugLog($keyValue);
-		debugLog($columns);
+    	//debugLog($values);
+		//debugLog($key);
+		//debugLog($keyValue);
+		//debugLog($columns);
     	$SQL = "UPDATE $table SET";
         foreach ( $values as $k => $v ){
-			debugLog($k);
+			//debugLog($k);
             if ( in_array($k,$columns) && $k != $key ){
-            	debugLog("Add to SQL");
+            	//debugLog("Add to SQL");
                 $SQL .= " $k = '" . mysql_real_escape_string($v) . "',";
             } else if ( $k == $key ){
 				$keyValue = $v;
@@ -163,7 +163,7 @@ class db {
 
         $SQL .= " WHERE $key = '" . mysql_real_escape_string($keyValue) . "'";
 
-		debugLog($SQL);
+		//debugLog($SQL);
         $results = $this->query($SQL);
         if ( $results )
             return $keyValue;

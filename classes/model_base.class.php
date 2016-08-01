@@ -23,7 +23,7 @@ class model_base {
 	}
 
 	public function save(){
-		debugLog("save()");
+		//debugLog("save()");
 
 		$this->beforeSave();
 
@@ -89,18 +89,18 @@ class model_base {
 	}
 
 	public function __set($name,$val){
-		debugLog("__set($name,$val)");
+		//debugLog("__set($name,$val)");
 		if ( array_key_exists($name,$this->data) || in_array($name,$this->columns) ){
-			debugLog("database field");
+			//debugLog("database field");
 			$this->data["$name"] = $val;
 			$this->changed = true;
 			//$this->save();
 		} else {
-			debugLog("session field");
+			//debugLog("session field");
 			$_SESSION["{$this->table}"]["$name"] = $val;
 		}
 
-		debugLog($this->data);
+		//debugLog($this->data);
 	}
 
 	public function getKey(){
@@ -126,7 +126,7 @@ class model_base {
 	}
 
 	function __destruct(){
-		/*debugLog("Destruct model_base");
+		/*//debugLog("Destruct model_base");
 		if ( $this->changed == true )
 			$this->save();*/
 	}

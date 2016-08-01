@@ -65,7 +65,7 @@ class user_base extends model_base {
 
 	function login($username,$password){
 		global $db;
-		debugLog($password);
+		//debugLog($password);
 		$SQL = "SELECT user_id FROM users WHERE UPPER(" . $this->username_field . ") = '" . $db->escape( strtoupper($username) ) . "' AND user_password = '" . md5($password) . "'";
 		$r = $db->query($SQL);
 		if ( $db->numrows($r) > 0 ){
@@ -118,7 +118,7 @@ class user_base extends model_base {
 	function destruct(){
 		unset($_SESSION['error']);
 	}
-	
+
 	function getPasswordField(){
 		return $this->password_field;
 	}
