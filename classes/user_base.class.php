@@ -6,7 +6,10 @@ class user_base extends model_base {
 							"user_email",
 							"user_password",
 							"dt_created",
-							"user_name");
+							"user_name",
+							"user_verified",
+							"user_verifycode"
+	);
 
 	protected $key = "user_id";
 	protected $username_field = "user_name";
@@ -72,10 +75,16 @@ class user_base extends model_base {
 			$row = $db->fetchrow($r);
 			$this->load($row['user_id']);
 
-			$_SESSION['user_id'] = $row['user_id'];
+			if ( $this->user_verified == 1 ){
+				$_SESSION['user_id'] = $row['user_id'];
 
-			$this->logged_in = true;
-			return true;
+				$this->logged_in = true;
+				return true;
+			} else {
+				$_SESSION['error'] = "Email address not verified";
+				$this->logged_in = false;
+				return false;
+			}
 
 		} else {
 			$this->logged_in = false;
@@ -97,18 +106,19 @@ class user_base extends model_base {
 		exit;
 	}
 
-	function verify($verifyCode,$email){
+	static function verify($verifyCode){
 		global $db;
-		$SQL = "SELECT user_id FROM users WHERE user_verifycode = '" . $verifyCode . "' AND user_email='" . $email . "'";
+		$SQL = "SELECT user_id FROM users WHERE user_verifycode = '" . $db->escape($verifyCode) . "'";
 		$r = $db->query($SQL);
 		if ( $db->numrows($r) > 0 ){
 
 			$row = $db->fetchrow($r);
-			$this->load($row['user_id']);
-			$this->user_verifycode = '';
-			$this->user_verified='1';
+			$u = new user($row['user_id']);
+			$u->load($row['user_id']);
+			$u->user_verifycode = '';
+			$u->user_verified='1';
 
-			return $this->save();
+			return $u->save();
 
 		} else {
 			return false;
