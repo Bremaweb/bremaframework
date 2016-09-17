@@ -71,27 +71,21 @@ class user_base extends model_base {
 		//debugLog($password);
 		$SQL = "SELECT user_id FROM users WHERE UPPER(" . $this->username_field . ") = '" . $db->escape( strtoupper($username) ) . "' AND " . $this->password_field . " = '" . md5($password) . "'";
 		debugLog($SQL);
-		$l_r = $db->query($SQL);
-		if ( $db->numrows($l_r) > 0 ){
-			$l_row = $db->fetchrow($l_r);
-			$this->load($l_row['user_id']);
-			if ( $this->isLoaded() ){
-				debugLog($this);
-				if ( in_array("user_verified",$this->columns) ){
-					if ( $this->user_verified != "1" ){
-						$_SESSION['error'] = "Email address not verified";
-						$this->logged_in = false;
-						return false;
-					}
+		$r = $db->query($SQL);
+		if ( $db->numrows($r) > 0 ){
+			$row = $db->fetchrow($r);
+			$this->load($row['user_id']);
+			debugLog($this);
+			if ( in_array("user_verified",$this->columns) ){
+				if ( $this->user_verified != "1" ){
+					$_SESSION['error'] = "Email address not verified";
+					$this->logged_in = false;
+					return false;
 				}
-				$_SESSION['user_id'] = $row['user_id'];
-				$this->logged_in = true;
-				return true;
-			} else {
-				$this->logged_in = false;
-				$_SESSION['error'] = "Error loading user...";
-				return false;
 			}
+			$_SESSION['user_id'] = $row['user_id'];
+			$this->logged_in = true;
+			return true;
 		} else {
 			$_SESSION['error'] = "Incorrect login or password";
 			$this->logged_in = false;
