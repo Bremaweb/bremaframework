@@ -111,6 +111,10 @@ class model_base {
 		return $this->key;
 	}
 
+	public function getKeyValue(){
+		return $this->data[$this->key];
+	}
+
 	public function getTable(){
 		return $this->table;
 	}

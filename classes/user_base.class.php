@@ -42,7 +42,7 @@ class user_base extends model_base {
 	public function authenticate($required = true){
 		if ( $required == true ){
 			$slic = STAY_LOGGED_IN_COOKIE;
-			if ( $this->logged_in == false && ( !isset($_COOKIE["{$slic}"]) || $_COOKIE["{$slic}"] != $this->user_key ) ){
+			if ( $this->logged_in == false && ( !isset($_COOKIE["{$slic}"]) || $_COOKIE["{$slic}"] != $this->getKeyValue() ) ){
 				header("location: " . LOGIN_URL . "?redirect=" . $_SERVER['REQUEST_URI']);
 				exit;
 			} else {
@@ -53,7 +53,7 @@ class user_base extends model_base {
 					$this->load($user_id);
 
 				if ( isset($_SESSION['expires']) ){
-					if ( $_SESSION['expires'] < time() && $_COOKIE["{$slic}"] != $this->user_key ){
+					if ( $_SESSION['expires'] < time() && $_COOKIE["{$slic}"] != $this->getKeyValue() ){
 						session_destroy();
 						header("location: " . LOGIN_URL . "?redirect=" . $_SERVER['REQUEST_URI']);
 						exit;
