@@ -18,7 +18,7 @@ class model_base {
 
 		if ( $_key != "" ){
 			if ( !$this->load($_key,$isGuid) ){
-				errorLog("Unable to load " . get_class($this) . " key " . $_key);
+				debugLog("Unable to load " . get_class($this) . " key " . $_key);
 				return false;
 			}
 		}
