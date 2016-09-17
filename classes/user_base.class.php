@@ -69,14 +69,15 @@ class user_base extends model_base {
 	function login($username,$password){
 		global $db;
 		//debugLog($password);
-		$SQL = "SELECT user_id FROM users WHERE UPPER(" . $this->username_field . ") = '" . $db->escape( strtoupper($username) ) . "' AND user_password = '" . md5($password) . "'";
+		$SQL = "SELECT user_id FROM users WHERE UPPER(" . $this->username_field . ") = '" . $db->escape( strtoupper($username) ) . "' AND " . $this->password_field . " = '" . md5($password) . "'";
+		debugLog($SQL);
 		$r = $db->query($SQL);
 		if ( $db->numrows($r) > 0 ){
 			$row = $db->fetchrow($r);
 			$this->load($row['user_id']);
 
 			if ( in_array("user_verified",$this->columns) ){
-				if ( $this->user_verified != 1 ){
+				if ( $this->user_verified != "1" ){
 					$_SESSION['error'] = "Email address not verified";
 					$this->logged_in = false;
 					return false;
@@ -86,6 +87,7 @@ class user_base extends model_base {
 			$this->logged_in = true;
 			return true;
 		} else {
+			$_SESSION['error'] = "Incorrect login or password";
 			$this->logged_in = false;
 			return false;
 		}
