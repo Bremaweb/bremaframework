@@ -75,17 +75,16 @@ class user_base extends model_base {
 			$row = $db->fetchrow($r);
 			$this->load($row['user_id']);
 
-			if ( $this->user_verified == 1 ){
-				$_SESSION['user_id'] = $row['user_id'];
-
-				$this->logged_in = true;
-				return true;
-			} else {
-				$_SESSION['error'] = "Email address not verified";
-				$this->logged_in = false;
-				return false;
+			if ( in_array("user_verified",$this->columns) ){
+				if ( $this->user_verified != 1 ){
+					$_SESSION['error'] = "Email address not verified";
+					$this->logged_in = false;
+					return false;
+				}
 			}
-
+			$_SESSION['user_id'] = $row['user_id'];
+			$this->logged_in = true;
+			return true;
 		} else {
 			$this->logged_in = false;
 			return false;
@@ -133,6 +132,9 @@ class user_base extends model_base {
 		return $this->password_field;
 	}
 
+	function loggedIn(){
+		return $this->logged_in;
+	}
 }
 
 ?>
