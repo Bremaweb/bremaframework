@@ -121,6 +121,7 @@ class db {
 
 	function getRow ($table, $columns, $key, $keyValue ){
 		$SQL = "SELECT " . implode(",",$columns) . " FROM " . $table . " WHERE " . $key . " = '" . $keyValue . "'";
+		debugLog($SQL);
 		return $this->queryrow($SQL);
 	}
 

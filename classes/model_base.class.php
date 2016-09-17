@@ -16,9 +16,12 @@ class model_base {
 		global $db;
 		$this->db = $db;
 
-		if ( $_key != "" )
-			$this->load($_key,$isGuid);
-
+		if ( $_key != "" ){
+			if ( !$this->load($_key,$isGuid) ){
+				errorLog("Unable to load " . get_class($this) . " key " . $_key);
+				return false;
+			}
+		}
 		$this->afterConstruct($_key,$isGuid);
 	}
 
@@ -58,6 +61,7 @@ class model_base {
 	protected function afterConstruct($_key,$isGuid) { }
 
 	public function load($keyValue,$isGuid = false){
+		debugLog("loading from " . $this->table . " " . $this->key . " " . $keyValue);
 		if ( ($this->data = $this->db->getRow($this->table, $this->columns, ($isGuid == true ? "guid" : $this->key), $keyValue)) !== false ){
 			$this->loaded=true;
 			$this->id = $this->data["{$this->key}"];
