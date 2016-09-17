@@ -75,7 +75,7 @@ class user_base extends model_base {
 		if ( $db->numrows($r) > 0 ){
 			$row = $db->fetchrow($r);
 			$this->load($row['user_id']);
-			debugLog($this);
+
 			if ( in_array("user_verified",$this->columns) ){
 				if ( $this->user_verified != "1" ){
 					$_SESSION['error'] = "Email address not verified";
