@@ -13,6 +13,7 @@ class model_base {
 	private $data = array();
 
 	function __construct($_key="",$isGuid = false){
+		debugLog("__construct($_key,$isGuid)");
 		global $db;
 		$this->db = $db;
 
