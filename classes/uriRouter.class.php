@@ -25,11 +25,11 @@ class uriRouter {
 			$view_dir = APP_DIR . "/views";
 
 		//$requestURI = rtrim($requestURI,'/');
-		  debugLog("Original URI: " . $requestURI);
+		  //debugLog("Original URI: " . $requestURI);
 		  $parpos = strpos($requestURI,"?");
 		  if (  $parpos !== false ){
 			// strip the parameters off the end of the requesturi
-			debugLog("parpos: " . $parpos);
+			//debugLog("parpos: " . $parpos);
 			$requestURI = substr($requestURI,0,$parpos);
 		  }
 
@@ -38,7 +38,7 @@ class uriRouter {
 			if ( $requestURI == "" )
 				$requestURI = "/";
 
-		  debugLog("Mod URI: " . $requestURI);
+		  //debugLog("Mod URI: " . $requestURI);
 
 		// match the URI
 		$route = false;
