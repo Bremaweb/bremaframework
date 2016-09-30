@@ -97,7 +97,7 @@ class db {
         $SQLv = "";
         foreach ( $values as $k => $v ){
             if ( in_array($k,$columns) ){
-                $SQLv .= "'" . mysql_real_escape_string($v) . "',";
+                $SQLv .= "'" . $this->escape($v) . "',";
                 $SQL .= "$k,";
             }
         }
@@ -129,7 +129,7 @@ class db {
 		$p2 = array();
 		$SQL = "SELECT " . implode(",",$columns) . " FROM " . $table;
 		foreach ( $params as $k => $v )
-			$p2[] = $k . " = '" . mysql_real_escape_string($v) . "' ";
+			$p2[] = $k . " = '" . $this->escape($v) . "' ";
 		$SQL .= " WHERE " . implode("AND ", $p2);
 		return $this->queryrow($SQL);
 	}
@@ -150,7 +150,7 @@ class db {
 			//debugLog($k);
             if ( in_array($k,$columns) && $k != $key ){
             	//debugLog("Add to SQL");
-                $SQL .= " $k = '" . mysql_real_escape_string($v) . "',";
+                $SQL .= " $k = '" . $this->escape($v) . "',";
             } else if ( $k == $key ){
 				$keyValue = $v;
 			}
@@ -162,7 +162,7 @@ class db {
 
         $SQL = rtrim($SQL,",");
 
-        $SQL .= " WHERE $key = '" . mysql_real_escape_string($keyValue) . "'";
+        $SQL .= " WHERE $key = '" . $this->escape($keyValue) . "'";
 
 		//debugLog($SQL);
         $results = $this->query($SQL);

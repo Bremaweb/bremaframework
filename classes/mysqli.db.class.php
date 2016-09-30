@@ -2,23 +2,23 @@
 
 class db {
 
-    private $dbconn = "";
     private $result = "";
 	private $_dbconn;
     function __construct($host, $port, $database, $user, $password){	// original parameters ($dbHost,$dbPort,$dbDatabase,$dbUser,$dbPassword)
     	    $this->_dbconn = mysqli_connect($host,$user,$password,$database,$port);
 			if ( !$this->_dbconn )
-				die("Unable to connect to database..." . mysql_error());
+				die("Unable to connect to database..." . mysqli_error($this->_dbconn));
     }
 
     function query($SQL, $displayErrors = true){
-    	debugLog("query($SQL)");
+    	debugLog("query($SQL)",4);
         $this->result = @mysqli_query($this->_dbconn, $SQL);
 
-        if ($displayErrors && !$this->result){
-        	debugLog(mysqli_error());
-            //echo "SQL Error: " . mysql_error() . "<br><br>" . $SQL . "<br><br>";
+        if (!$this->result){
+        	debugLog(mysqli_error($this->_dbconn));
+            debugLog($SQL);
         }
+
         return $this->result;
     }
 
@@ -27,7 +27,7 @@ class db {
         $result = $this->query($SQL, $displayErrors);
             if ($result){
                 return $this->fetchrow($result);
-                @mysql_free_result($result);
+                @mysqli_free_result($result);
             }else{
                 return false;
             }
@@ -38,28 +38,28 @@ class db {
         if (!$result)
             $result = $this->result;
 
-        $row = @mysql_fetch_assoc($result);
+        $row = @mysqli_fetch_assoc($result);
         return $row;
     }
 
     function lastid(){
-        return mysql_insert_id();
+        return mysqli_insert_id();
     }
 
     function numrows($result=0){
         if (!$result)
             $result = $this->result;
 
-        return @mysql_num_rows($result);
+        return @mysqli_num_rows($result);
     }
 
 	function affectedrows(){
 
-        return @mysql_affected_rows();
+        return @mysqli_affected_rows();
     }
 
     function __destruct(){
-        mysql_close($this->dbconn);
+        mysqli_close($this->_dbconn);
     }
 
 	function getRows($SQL,$optionArray=false){
@@ -88,7 +88,7 @@ class db {
         $SQLv = "";
         foreach ( $values as $k => $v ){
             if ( in_array($k,$columns) ){
-                $SQLv .= "'" . mysql_real_escape_string($v) . "',";
+                $SQLv .= "'" . $this->escape($v) . "',";
                 $SQL .= "$k,";
             }
         }
@@ -105,7 +105,7 @@ class db {
 
         $results = $this->query($SQL);
         if ( $results )
-            return mysql_insert_id();
+            return mysqli_insert_id();
         else
             return false;
     }
@@ -119,7 +119,7 @@ class db {
 		$p2 = array();
 		$SQL = "SELECT " . implode(",",$columns) . " FROM " . $table;
 		foreach ( $params as $k => $v )
-			$p2[] = $k . " = '" . mysql_real_escape_string($v) . "' ";
+			$p2[] = $k . " = '" . $this->escape($v) . "' ";
 		$SQL .= " WHERE " . implode("AND ", $p2);
 		return $this->queryrow($SQL);
 	}
@@ -140,7 +140,7 @@ class db {
 			debugLog($k);
             if ( in_array($k,$columns) && $k != $key ){
             	debugLog("Add to SQL");
-                $SQL .= " $k = '" . mysql_real_escape_string($v) . "',";
+                $SQL .= " $k = '" . $this->escape($v) . "',";
             } else if ( $k == $key ){
 				$keyValue = $v;
 			}
@@ -152,7 +152,7 @@ class db {
 
         $SQL = rtrim($SQL,",");
 
-        $SQL .= " WHERE $key = '" . mysql_real_escape_string($keyValue) . "'";
+        $SQL .= " WHERE $key = '" . $this->escape($keyValue) . "'";
 
 		debugLog($SQL);
         $results = $this->query($SQL);
@@ -174,7 +174,7 @@ class db {
 	}
 
 	function escape($str){
-		return mysql_real_escape_string($str);
+		return mysqli_real_escape_string($this->_dbconn,$str);
 	}
 }
 

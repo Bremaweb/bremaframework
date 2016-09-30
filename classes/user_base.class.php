@@ -18,6 +18,7 @@ class user_base extends model_base {
 	public $data = array();
 
 	function __construct($require_login=false,$user_id=""){
+		debugLog(get_class($this) . "->__construct($require_login,$user_id)",3);
 		global $db;
 		$this->db = $db;
 
@@ -40,6 +41,7 @@ class user_base extends model_base {
 	}
 
 	public function authenticate($required = true){
+		debugLog(get_class($this) . "->authenticate($required)",3);
 		if ( $required == true ){
 			$slic = STAY_LOGGED_IN_COOKIE;
 			if ( $this->logged_in == false && ( !isset($_COOKIE["{$slic}"]) || $_COOKIE["{$slic}"] != $this->getKeyValue() ) ){
@@ -47,10 +49,7 @@ class user_base extends model_base {
 				exit;
 			} else {
 				// go ahead and load the user
-				if ( $user_id == "" )
-					$this->load($_SESSION['user_id']);
-				else
-					$this->load($user_id);
+				$this->load($_SESSION['user_id']);
 
 				if ( isset($_SESSION['expires']) ){
 					if ( $_SESSION['expires'] < time() && $_COOKIE["{$slic}"] != $this->getKeyValue() ){
@@ -67,9 +66,9 @@ class user_base extends model_base {
 	}
 
 	function login($username,$password){
+		debugLog(get_class($this) . "->login($username,$password)",3);
 		global $db;
-		//debugLog($password);
-		$SQL = "SELECT user_id FROM users WHERE UPPER(" . $this->username_field . ") = '" . $db->escape( strtoupper($username) ) . "' AND user_password = '" . md5($password) . "'";
+		$SQL = "SELECT user_id FROM users WHERE UPPER(" . $this->username_field . ") = '" . $db->escape( strtoupper($username) ) . "' AND " . ( $this->password_field != null ? $this->password_field : "user_password" ) . " = '" . md5($password) . "'";
 		$r = $db->query($SQL);
 		if ( $db->numrows($r) > 0 ){
 			$row = $db->fetchrow($r);

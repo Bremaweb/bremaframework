@@ -1,8 +1,13 @@
 <?php
+// debug levels
+// 1 - important
+// 2 - some trace
+// 3 - verbose (constructors, method calls)
+// 4 - all of the above + SQL queries
 
-function debugLog($text){
+function debugLog($text,$level = 1){
 
-	if ( DEBUG ){
+	if ( DEBUG >= $level ){
 		//if ( is_array($text) ){
 		//	ksort($text);
 			ob_start();
