@@ -186,6 +186,24 @@ class db {
 	function escape($str){
 		return mysql_real_escape_string($str);
 	}
+
+	function pQuery($table,$columns,$params){
+		$p2 = array();
+
+		if ( $columns == "" )
+			$columns = $this->getTableCols($table);
+
+		$SQL = "SELECT " . implode(",",$columns) . " FROM " . $table;
+		foreach ( $params as $k => $v ){
+			if ( is_array($v) ){
+				$p2[] = $v[0] . " " . $k . " " . $v[1] . " '" . $this->escape($v[2]) . "'";
+			} else {
+				$p2[] = $k . " = '" . $this->escape($v) . "' ";
+			}
+		}
+		$SQL .= " WHERE " . implode("AND ", $p2);
+		return $this->query($SQL);
+	}
 }
 
 ?>
