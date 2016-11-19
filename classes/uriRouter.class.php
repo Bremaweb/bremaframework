@@ -87,6 +87,10 @@ class uriRouter {
 		  }
 	}
 
+	function getURI(){
+		return ltrim(implode("/",$this->params),"/");
+	}
+
 	function go(){
 		$route = $this->getRoute($_SERVER['REQUEST_URI']);
 	}

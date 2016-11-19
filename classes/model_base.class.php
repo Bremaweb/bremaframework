@@ -36,7 +36,7 @@ class model_base {
 
 		if ( $this->loaded == true ){
 			debugLog("loaded so updating",4);
-			$retVal = $this->db->updateRow($this->table, $this->data, $this->key, $this->id, $this->columns);
+			$retVal = $this->db->updateRow($this->table, $this->data, $this->key, $this->id);
 		} else {
 			debugLog("no loaded so inserting",4);
 			if ( $this->db->insertRow($this->table, $this->data) !== false )
@@ -50,7 +50,7 @@ class model_base {
 		$this->afterSave();
 
 		$this->changed = false;
-
+		debugLog("RetVal: " . $retVal);
 		return $retVal;
 	}
 

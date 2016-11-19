@@ -98,6 +98,7 @@ $message = array();
 		}
 
 		$model->arraySet($_REQUEST["{$table}"]);
+
 		if ( $model->save() ){
 			$retVal['success'] = 1;
 			$retVal['id'] = $model->id;

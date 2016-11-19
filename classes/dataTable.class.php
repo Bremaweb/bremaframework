@@ -5,6 +5,8 @@ class dataTable {
 	private $_bootstrap;
 	private $_columns = array();
 	private $_actions;
+	private $_groupby;
+	private $_rowurl;
 
 	function __construct($bootstrap=false){
 		$this->_boostrap = $bootstrap;
@@ -32,6 +34,14 @@ class dataTable {
 		$this->_actions = $a;
 	}
 
+	public function setGroup($g){
+		$this->_groupby = $g;
+	}
+
+	public function setRowUrl($url){
+		$this->_rowurl = $url;
+	}
+
 	public function render(){
 		global $db;
 
@@ -50,8 +60,27 @@ class dataTable {
 		if ( $db->numrows($r) == 0 ){
 			echo "<tr><td colspan=\"500\">No results!</td></tr>";
 		} else {
+			$last_group = null;
 			while ( $row = $db->fetchrow($r) ){
-				echo "<tr>";
+				if ( $this->_groupby != "" ){
+					$row_group = $row["{$this->_groupby}"];
+					if ( $row_group != $last_group ){
+						$clean_row_group = cleanURL($row_group);
+						echo "<thead>";
+						echo "<tr class=\"group-header\" data-group=\"" . $clean_row_group . "\"><td colspan=\"" . (count($this->_columns) + 1) . "\">" . $row_group . "</td></tr>";
+						echo "</thead>";
+					}
+					$last_group = $row_group;
+				}
+				echo "<tr";
+
+					if ( $this->_groupby != "" )
+						echo " class=\"group-row group-" . $clean_row_group . "\"";
+
+					if ( $this->_rowurl != "" )
+						echo " data-href=\"" . vsprintf($this->_rowurl,$row) . "\"";
+
+				echo ">";
 					foreach ( $this->_columns as $c ){
 						echo "<td>";
 							$c->render($row);

@@ -28,7 +28,7 @@ class tableForm {
 		return $this->_data["{$key}"];
 	}
 
-	public function generate($blankEnd = false){
+	public function render($blankEnd = false){
 		$m = $this->model;
 		$cl = new $m();
 
@@ -36,7 +36,7 @@ class tableForm {
 		$key = $cl->getKey();
 		$fd = $cl->getFormDetails();
 
-		$SQL = "SELECT " . $key . ", " . implode(",",$this->columns) . " FROM " . $table;
+		$SQL = "SELECT " . implode(",",$this->columns) . " FROM " . $table;
 			if ( $this->query != "" )
 				$SQL .= " WHERE " . $this->query;
 
@@ -44,7 +44,7 @@ class tableForm {
 				$SQL .= " " . $this->order_by;
 
 		$results = $this->db->query($SQL);
-
+		/*
 		$guid = GUID();
 		$form = new PFBC\Form($guid);
 		$form->configure(array(
@@ -55,21 +55,44 @@ class tableForm {
 				"model" => $this->table
 		));
 		$form->addElement(new PFBC\Element\Hidden("guid",$guid));
-
-			foreach ( $this->columns as $column ){
-				echo "<th>" . $fd["{$column}"]['label'] . "</th>";
-			}
-			echo "</tr>";
-
-			while ( $row = $this->db->fetchrow($results) ){
-				echo "<tr>";
+		*/
+		echo "<form method=\"post\">";
+			echo "<table>";
 				foreach ( $this->columns as $column ){
-					echo "<td>" .
+					echo "<th>" . $fd["{$column}"]['label'] . "</th>";
 				}
 				echo "</tr>";
-			}
 
-		echo "</table>";
+				while ( $row = $this->db->fetchrow($results) ){
+					echo "<tr>";
+					foreach ( $this->columns as $column ){
+							if ( $column == $key ){
+								echo "<td>" . $row["$column"] . "<input type=\"hidden\" name=\"" . $column . "[]\" value=\"" . $row["$column"] . "\" /></td>";
+							} else {
+								echo "<td>";
+									echo "<input type=\"text\" name=\"" . $column . "[]\" value=\"" . $row["$column"] . "\" />";
+								echo "</td>";
+							}
+
+					}
+					echo "</tr>";
+				}
+				if ( $blankEnd == true ){
+					// add a blank one on the end to add a new item
+					foreach ( $this->columns as $column ){
+						if ( $column == $key ){
+							echo "<td>&nbsp;<input type=\"hidden\" name=\"" . $column . "[]\" /></td>";
+						} else {
+							echo "<td>";
+								echo "<input type=\"text\" name=\"" . $column . "[]\" />";
+							echo "</td>";
+						}
+					}
+				}
+
+			echo "</table>";
+			echo "<input type=\"submit\" name=\"save_button\" value=\"Save\" />";
+		echo "</form>";
 	}
 }
 

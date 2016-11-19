@@ -42,8 +42,16 @@ class db {
         return $row;
     }
 
+    function fetcharray($result = 0){
+    	if (!$result)
+    		$result = $this->result;
+
+    	$row = @mysqli_fetch_array($result);
+    	return $row;
+    }
+
     function lastid(){
-        return mysqli_insert_id();
+        return mysqli_insert_id($this->_dbconn);
     }
 
     function numrows($result=0){
@@ -69,7 +77,7 @@ class db {
 			return false;
 
 		$returnRows = array();
-		while ( $row = $this->fetchrow($results) ){
+		while ( $row = $this->fetcharray($results) ){
 			if ( $optionArray )
 				$returnRows[$row[0]] = $row[1];
 			else
@@ -82,8 +90,8 @@ class db {
     function insertRow($table, $values){
     	debugLog("insertRow($table,$values);");
     	debugLog($values);
-    	$columns = $this->getTableCols($table);
-    	debugLog($values);
+    	$columns = $this->getTableCols($table,false);
+    	debugLog($columns);
         $SQL = "INSERT INTO $table (";
         $SQLv = "";
         foreach ( $values as $k => $v ){
@@ -162,11 +170,14 @@ class db {
             return false;
     }
 
-	function getTableCols($table){
+	function getTableCols($table,$include_ai=true){
 		$retVal = array();
 		$SQL = "SHOW FIELDS FROM $table";
 		$results = $this->query($SQL);
 		while ( $row = $this->fetchrow($results) ){
+			if ( $include_ai == false && $row['Extra'] == "auto_increment" )
+				continue;
+
 			$retVal[] = $row['Field'];
 		}
 
