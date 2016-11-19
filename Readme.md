@@ -41,3 +41,12 @@ Mandrill PHP Class
 ==================
 https://bitbucket.org/mailchimp/mandrill-api-php
 Licensed under the Apache License, Version 2.0 (the "License")
+
+Amazon S3 Class
+===============
+Copyright (c) 2013, Donovan Schönknecht.  All rights reserved.
+
+Crawler Class
+=============
+I don't remember where it came from....
+
