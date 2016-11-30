@@ -1,7 +1,7 @@
 Brema Web Framework
 ===================
 
-A basic MVC framework for building websites and web applications.
+A basic MVC framework for building websites and web applications. A bare bones repository to start using this framework can be found at https://github.com/Bremaweb/bremaframework_app
 
 Copyright (c) 2016 Brandon Bohannon <brandon@bremaweb.com> and contributors.
 
