@@ -5,15 +5,17 @@ class settings{
 	private $key;
 	private $keyvalue;
 
+	private $db;
+
 	function __construct ($table = "settings", $key="setting", $keyvalue=""){
-		global $db;
+		$this->db = dbConnection::getConnection();
 		$SQL="SELECT * FROM $table ";
 
 		if ( $keyvalue != "" )
-			$SQL .= "WHERE " . $key . " = '" . $db->escape($keyvalue) . "'";
+			$SQL .= "WHERE " . $key . " = '" . $this->db->escape($keyvalue) . "'";
 
-		$results = $db->query($SQL);
-		while ( $row = $db->fetchrow($results) )
+		$results = $this->db->query($SQL);
+		while ( $row = $this->db->fetchrow($results) )
 			$this->settingValues["{$row['setting']}"] = $row['setting_value'];
 	}
 
@@ -30,7 +32,7 @@ class settings{
 		else
 			$SQL = "INSERT INTO settings ( setting, setting_value ) values('$sName','$sVal')";
 
-		$results = $db->query($SQL);
+		$results = $this->db->query($SQL);
 		if ( $results ) {
 			$this->settingValues["$sName"]=$sVal;
 			return true;

@@ -5,21 +5,27 @@ class model_base {
 
 	protected $loaded = false;
 	protected $changed = false;
-	protected $table = "";
-	protected $columns = "";
-	protected $key = "";
+	protected $table = null;
+	protected $columns = null;
+	protected $key = null;
 	protected $db;
 
 	private $data = array();
+	private $tableDefinition;
 
 	function __construct($_key="",$isGuid = false){
 		debugLog(get_class($this) . "->__construct($_key,$isGuid)",3);
-		global $db;
-		$this->db = $db;
+		$this->db = dbConnection::getConnection();
+
+		if ( $this->table === null ){
+			$this->table = get_class($this);
+		}
+
+		$this->tableDefinition = new tableDefinition($this->table);
 
 		if ( $_key != "" ){
 			if ( !$this->load($_key,$isGuid) ){
-				//debugLog("Unable to load " . get_class($this) . " key " . $_key);
+
 				return false;
 			}
 		}
@@ -206,6 +212,9 @@ class model_base {
 					case "Button":
 						$hasButton = true;
 						$form->addElement(new $el($attributes['label'],$attributes['button_type'],$this->element_attributes($field_name)));
+					break;
+					case "Select":
+						$form->addElement(new $el($attributes['label'],$attributes['name'],$attributes['options'],$this->element_attributes($field_name)));
 					break;
 					default:
 						$form->addElement(new $el($attributes['label'],$this->element_name($field_name),$this->element_attributes($field_name)));

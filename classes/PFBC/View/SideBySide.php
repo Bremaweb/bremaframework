@@ -30,7 +30,7 @@ class SideBySide extends \PFBC\View {
                     echo '</div>';
             }
             else {
-				echo '<div class="form-group" id="element_', $element->getAttribute('id'), '">', $this->renderLabel($element), '<div class="controls">', $element->render(), $this->renderDescriptions($element), '</div></div>';
+				echo '<div class="form-group" id="element_', $element->getAttribute('id'), '">', $this->renderLabel($element), '<div class="controls col-sm-8">', $element->render(), $this->renderDescriptions($element), '</div></div>';
 				++$elementCount;
 			}
 		}
@@ -41,7 +41,7 @@ class SideBySide extends \PFBC\View {
 	protected function renderLabel(\PFBC\Element $element) {
         $label = $element->getLabel();
         if(!empty($label)) {
-			echo '<label class="control-label" for="', $element->getAttribute("id"), '">';
+			echo '<label class="col-sm-2 control-label" for="', $element->getAttribute("id"), '">';
 			if($element->isRequired())
 				echo '<span class="required">* </span>';
 			echo $label, '</label>';

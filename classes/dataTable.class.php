@@ -7,9 +7,11 @@ class dataTable {
 	private $_actions;
 	private $_groupby;
 	private $_rowurl;
+	private $db;
 
 	function __construct($bootstrap=false){
 		$this->_boostrap = $bootstrap;
+		$this->db = dbConnection::getConnection();
 	}
 
 	public function addColumns($aryColumns){
@@ -43,8 +45,6 @@ class dataTable {
 	}
 
 	public function render(){
-		global $db;
-
 		echo "<table class=\"table table-striped table-hover table-bordered\">";
 		echo "<tr>";
 			echo "<thead>";
@@ -56,12 +56,12 @@ class dataTable {
 					echo "<th>&nbsp;</th>";
 			echo "</thead>";
 		echo "</tr>";
-		$r = $db->query($this->_query);
-		if ( $db->numrows($r) == 0 ){
+		$r = $this->db->query($this->_query);
+		if ( $this->db->numrows($r) == 0 ){
 			echo "<tr><td colspan=\"500\">No results!</td></tr>";
 		} else {
 			$last_group = null;
-			while ( $row = $db->fetchrow($r) ){
+			while ( $row = $this->db->fetchrow($r) ){
 				if ( $this->_groupby != "" ){
 					$row_group = $row["{$this->_groupby}"];
 					if ( $row_group != $last_group ){

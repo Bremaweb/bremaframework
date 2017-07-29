@@ -15,12 +15,16 @@ class user_base extends model_base {
 	protected $username_field = "user_name";
 	protected $password_field = null;
 
+	private $tableDefinition = null;
+
 	public $data = array();
 
 	function __construct($require_login=false,$user_id=""){
 		debugLog(get_class($this) . "->__construct($require_login,$user_id)",3);
-		global $db;
-		$this->db = $db;
+
+		$this->db = dbConnection::getConnection();
+
+		$this->tableDefinition = new tableDefinition($this->table);
 
 		if ( session_status() !== PHP_SESSION_ACTIVE ){
 			session_set_cookie_params( (86400 * 90) );
@@ -35,7 +39,7 @@ class user_base extends model_base {
 		if ( $user_id != "" ){
 			$this->load($user_id);
 		} else {
-			if ( $require_login == false && $_SESSION['user_id'] != "" )
+			if ( $require_login == false && !empty($_SESSION['user_id']) )
 				$this->load($_SESSION['user_id']);
 		}
 	}
@@ -67,13 +71,11 @@ class user_base extends model_base {
 
 	function login($username,$password){
 		debugLog(get_class($this) . "->login($username,$password)",3);
-		global $db;
-		$SQL = "SELECT user_id FROM users WHERE UPPER(" . $this->username_field . ") = '" . $db->escape( strtoupper($username) ) . "' AND " . ( $this->password_field != null ? $this->password_field : "user_password" ) . " = '" . md5($password) . "'";
-		$r = $db->query($SQL);
-		if ( $db->numrows($r) > 0 ){
-			$row = $db->fetchrow($r);
+		$SQL = "SELECT user_id FROM users WHERE `" . $this->username_field . "` = '" . $this->db->escape( $username ) . "' AND " . ( $this->password_field != null ? $this->password_field : "user_password" ) . " = '" . md5($password) . "'";
+		$r = $this->db->query($SQL);
+		if ( $this->db->numrows($r) > 0 ){
+			$row = $this->db->fetchrow($r);
 			$this->load($row['user_id']);
-
 			if ( in_array("user_verified",$this->columns) ){
 				if ( $this->user_verified != 1 ){
 					$_SESSION['error'] = "Email address not verified";

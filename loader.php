@@ -4,11 +4,7 @@ require_once(BREMA_DIR . "/classes/autoloader.class.php");
 $autoloader = new ClassAutoLoader();
 
 // INCLUDE APPLICATION FILES
-$dr = @include_once(APP_DIR . "/config/db_config.php");
-if ( $dr == 1 ){
-	require_once(BREMA_DIR . "/classes/" . DB_TYPE . ".db.class.php");
-	$db = new db(DB_HOST,DB_PORT,DATABASE,DB_USER,DB_PASSWORD);
-}
+@include_once(APP_DIR . "/config/db_config.php");
 @include_once(APP_DIR . "/config/mail_config.php");
 @include_once(APP_DIR . "/includes/functions.php");
 
