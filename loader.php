@@ -12,8 +12,6 @@ $autoloader = new ClassAutoLoader();
 require_once(BREMA_DIR . "/functions.php");
 require_once(BREMA_DIR . "/html_helpers.php");
 
-$router = new uriRouter();
-
 // static routes can be configured in a config/routes.php file or routes can be setup dynamically in the application
 if ( defined('ROUTE_FILE') !== false ){
 	@include_once(ROUTE_FILE);

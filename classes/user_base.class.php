@@ -24,7 +24,7 @@ class user_base extends model_base {
 
 		$this->db = dbConnection::getConnection();
 
-		$this->tableDefinition = new tableDefinition($this->table);
+		$this->tableDefinition = new tableDefinition($this->table, $this->db);
 
 		if ( session_status() !== PHP_SESSION_ACTIVE ){
 			session_set_cookie_params( (86400 * 90) );
@@ -50,7 +50,7 @@ class user_base extends model_base {
 			$slic = STAY_LOGGED_IN_COOKIE;
 			if ( $this->logged_in == false && ( !isset($_COOKIE["{$slic}"]) || $_COOKIE["{$slic}"] != $this->getKeyValue() ) ){
 				header("location: " . LOGIN_URL . "?redirect=" . $_SERVER['REQUEST_URI']);
-				exit;
+				return false;
 			} else {
 				// go ahead and load the user
 				$this->load($_SESSION['user_id']);
@@ -59,12 +59,12 @@ class user_base extends model_base {
 					if ( $_SESSION['expires'] < time() && $_COOKIE["{$slic}"] != $this->getKeyValue() ){
 						session_destroy();
 						header("location: " . LOGIN_URL . "?redirect=" . $_SERVER['REQUEST_URI']);
-						exit;
+						return false;
 					}
 				}
 
-				$_SESSION['expires'] = ( time() + 3600 );
-
+				$_SESSION['expires'] = ( time() + 86400 );
+				return true;
 			}
 		}
 	}

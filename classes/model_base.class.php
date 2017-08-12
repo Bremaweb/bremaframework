@@ -2,26 +2,27 @@
 
 class model_base {
 	public $id;
+	public $db;
 
 	protected $loaded = false;
 	protected $changed = false;
 	protected $table = null;
 	protected $columns = null;
 	protected $key = null;
-	protected $db;
+	protected $dbConnectionName = 'default';
 
 	private $data = array();
 	private $tableDefinition;
 
 	function __construct($_key="",$isGuid = false){
 		debugLog(get_class($this) . "->__construct($_key,$isGuid)",3);
-		$this->db = dbConnection::getConnection();
+		$this->db = dbConnection::getConnection($this->dbConnectionName);
 
 		if ( $this->table === null ){
 			$this->table = get_class($this);
 		}
 
-		$this->tableDefinition = new tableDefinition($this->table);
+		$this->tableDefinition = new tableDefinition($this->table, $this->db);
 
 		if ( $_key != "" ){
 			if ( !$this->load($_key,$isGuid) ){
@@ -99,22 +100,22 @@ class model_base {
 
 	public function __get($name){
 		debugLog(get_class($this) . "->_get($name)",4);
-		if ( array_key_exists($name,$this->data) || in_array($name,$this->columns) )
-			return $this->data["$name"];
+		if ( array_key_exists($name,$this->data) )
+			return $this->data[$name];
 		else
-			return $_SESSION["{$this->table}"]["$name"];
+			return !empty($_SESSION[$this->table][$name]) ? $_SESSION[$this->table][$name] : false;
 	}
 
 	public function __set($name,$val){
 		debugLog(get_class($this) . "->($name,$val)",4);
 		if ( array_key_exists($name,$this->data) || in_array($name,$this->columns) ){
 			//debugLog("database field");
-			$this->data["$name"] = $val;
+			$this->data[$name] = $val;
 			$this->changed = true;
 			//$this->save();
 		} else {
 			//debugLog("session field");
-			$_SESSION["{$this->table}"]["$name"] = $val;
+			$_SESSION[$this->table][$name] = $val;
 		}
 
 		//debugLog($this->data);
@@ -153,7 +154,7 @@ class model_base {
 	}
 
 	private function element_name($field_name){
-		if ( $this->form_details["$field_name"]['name'] != "" ){
+		if ( !empty($this->form_details["$field_name"]['name']) ){
 			return $this->form_details["$field_name"]['name'];
 		} else {
 			if ( in_array($field_name,$this->columns) )
@@ -164,11 +165,13 @@ class model_base {
 	}
 
 	private function element_attributes($field_name){
-		global $user;
+		$user = authentication::getUser();
+
 		$form_details = $this->form_details;
 		$attr = array();
-		$attr["value"] = ($this->$field_name != "" ? $this->$field_name : $form_details["$field_name"]['default']);
-		if ( is_array($form_details["$field_name"]['attrib']) ){
+		$default = !empty($form_details["$field_name"]['default']) ? $form_details["$field_name"]['default'] : '';
+		$attr["value"] = ($this->$field_name != "" ? $this->$field_name : $default);
+		if ( !empty($form_details["$field_name"]['attrib']) && is_array($form_details["$field_name"]['attrib']) ){
 			foreach ( $form_details["$field_name"]['attrib'] as $k => $v ){
 				if ( $k == "user_field" ){
 					$k = "value";
@@ -178,14 +181,15 @@ class model_base {
 			}
 		}
 
-		if ( $attr["class"] == "" )
+		if ( empty($attr["class"]) )
 			$attr["class"] = "form-control";
 
 		return $attr;
 	}
 
 	public function form($ajax=1,$ajaxCallback="saveFormResponse",$action="ajax/saveForm",$view="SideBySide",$view_config=array(),$guid=false){
-		global $user;
+		$user = authentication::getUser();
+
 		$hasButton = false;
 		if ( $guid == false )
 			$guid = GUID();
@@ -205,16 +209,17 @@ class model_base {
 		if ( is_array($this->form_details) ){
 			foreach ( $this->form_details as $field_name => $attributes ){
 				$el = "PFBC\\Element\\" . $attributes['type'];
+				$default = !empty($attributes['default']) ? $attributes['default'] : '';
 				switch ( $attributes['type'] ){
 					case "Hidden":
-						$form->addElement(new $el($this->element_name($field_name),($this->$field_name != "" ? $this->$field_name : $attributes['default'])));
+						$form->addElement(new $el($this->element_name($field_name),($this->$field_name != "" ? $this->$field_name : $default)));
 					break;
 					case "Button":
 						$hasButton = true;
 						$form->addElement(new $el($attributes['label'],$attributes['button_type'],$this->element_attributes($field_name)));
 					break;
 					case "Select":
-						$form->addElement(new $el($attributes['label'],$attributes['name'],$attributes['options'],$this->element_attributes($field_name)));
+						$form->addElement(new $el($attributes['label'],$this->element_name($field_name),$attributes['options'],$this->element_attributes($field_name)));
 					break;
 					default:
 						$form->addElement(new $el($attributes['label'],$this->element_name($field_name),$this->element_attributes($field_name)));

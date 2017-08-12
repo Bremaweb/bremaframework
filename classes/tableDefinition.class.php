@@ -6,9 +6,9 @@ class tableDefinition {
 	private $primaryKey = null;
 	private $db = null;
 
-	function __construct($table){
+	function __construct($table, $dbConnection){
 		$this->table = $table;
-		$this->db = dbConnection::getConnection();
+		$this->db = $dbConnection;
 		$this->getTableDefinition();
 	}
 

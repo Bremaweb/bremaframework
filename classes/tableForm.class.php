@@ -3,7 +3,7 @@
 class tableForm {
 	private $_data = array();
 
-	function __construct($model=null,$columns=null,$query=null, $order_by = null){
+	function __construct($model=null,$columns=null,$query=null,$order_by = null){
 		if ( $model != null )
 			$this->model = $model;
 
@@ -15,9 +15,6 @@ class tableForm {
 
 		if ( $order_by != null )
 			$this->order_by = $order_by;
-
-		global $db;
-		$this->db = $db;
 	}
 
 	public function __set($key,$value){
@@ -25,7 +22,7 @@ class tableForm {
 	}
 
 	public function __get($key){
-		return $this->_data["{$key}"];
+		return !empty($this->_data["{$key}"]) ? $this->_data["{$key}"] : false;
 	}
 
 	public function render($blankEnd = false){
@@ -43,7 +40,7 @@ class tableForm {
 			if ( $this->order_by != "" )
 				$SQL .= " " . $this->order_by;
 
-		$results = $this->db->query($SQL);
+		$results = $cl->db->query($SQL);
 		/*
 		$guid = GUID();
 		$form = new PFBC\Form($guid);
@@ -63,7 +60,7 @@ class tableForm {
 				}
 				echo "</tr>";
 
-				while ( $row = $this->db->fetchrow($results) ){
+				while ( $row = $cl->db->fetchrow($results) ){
 					echo "<tr>";
 					foreach ( $this->columns as $column ){
 							if ( $column == $key ){

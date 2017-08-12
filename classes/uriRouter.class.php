@@ -2,10 +2,12 @@
 
 class uriRouter {
 
-	var $routes = array();
-	var $params = array();
-	function routeAdd($uri,$controller,$view = false){
-		if ( $view === false )
+	private static $routes = array();
+
+	public static $params = array();
+
+	public static function routeAdd($uri,$controller,$view = null, $requireAuthentication = false, $requirePermission = null){
+		if ( empty($view) )
 			$view = $controller;
 
 		$newRoute = array();
@@ -14,11 +16,13 @@ class uriRouter {
 		$newRoute['view'] = $view;
 		$newRoute['regex'] = $regex;
 		$newRoute['controller'] = $controller;
+		$newRoute['authenticate'] = !empty($requirePermission) ? true : $requireAuthentication;
+		$newRoute['permission'] = $requirePermission;
 
-		$this->routes[] = $newRoute;
+		self::$routes[] = $newRoute;
 	}
 
-	function getRoute($requestURI){
+	private static function getRoute($requestURI){
 		if ( defined('VIEW_DIR') !== false )
 			$view_dir = VIEW_DIR;
 		else
@@ -42,7 +46,7 @@ class uriRouter {
 
 		// match the URI
 		$route = false;
-		foreach ( $this->routes as $k => $v ){
+		foreach ( self::$routes as $k => $v ){
 			//echo "Matching: " . $v['regex'] . " -> " . $requestURI . "<br />";
 			if ( preg_match($v['regex'],$requestURI) === 1 ){
 				$route = $k;
@@ -51,11 +55,27 @@ class uriRouter {
 		}
 
 		  if ( $route !== false ){
-			$sRoute = $this->routes["{$route}"];
-			if ( ( $sRoute['view'] == null || file_exists($view_dir . "/" . $sRoute['view'] . ".view.php") )
-					&& ( file_exists(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php") || file_exists(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php") )  ){
+			$sRoute = self::$routes["{$route}"];
 
-				$this->params = explode("/",$requestURI);
+			if ( !empty($sRoute['authenticate']) ){
+				if ( !authentication::authenticate() ){
+					return false;
+				}
+			}
+
+			if ( !empty($sRoute['permission']) ){
+				if ( !authentication::hasPermission($sRoute['permission']) ){
+					header("Status: 403 Forbidden");
+					echo "403 Forbidden<br />";
+					return false;
+				}
+			}
+
+			if ( ( $sRoute['view'] == null || file_exists($view_dir . "/" . $sRoute['view'] . ".view.php") )
+					&& ( file_exists(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php")
+					|| file_exists(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php") )  ){
+
+				self::$params = explode("/",$requestURI);
 
 				@include(APP_DIR . "/includes/scripts.php");
 
@@ -77,22 +97,22 @@ class uriRouter {
 			} else {
 				header("Status: 404 Not Found");
 				echo "404 FILE NOT FOUND - Missing View or Controller - " . $sRoute['view'] . "/" . $sRoute['controller'] . "<br />";
-				exit;
+				return false;
 			}
 		  } else {
 			// undefined route
 				header("Status: 404 Not Found");
 				echo "404 FILE NOT FOUND - Undefined Route - " . $requestURI;
-				exit;
+				return false;
 		  }
 	}
 
-	function getURI(){
-		return ltrim(implode("/",$this->params),"/");
+	public static function getURI(){
+		return ltrim(implode("/",self::$params),"/");
 	}
 
-	function go(){
-		$route = $this->getRoute($_SERVER['REQUEST_URI']);
+	public static function go(){
+		return self::getRoute($_SERVER['REQUEST_URI']);
 	}
 }
 
