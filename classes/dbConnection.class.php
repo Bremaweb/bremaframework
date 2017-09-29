@@ -2,7 +2,7 @@
 
 class dbConnection {
 	private static $instance = array();
-	private static $connection = null;
+	protected $connection = null;
 
 	private function __construct($connName){
 		if ( dbConnectionsDef::defExists($connName) ){
@@ -22,7 +22,6 @@ class dbConnection {
 		} else {
 			self::$instance[$connName] = new dbConnection($connName);
 		}
-		debugLog(self::$instance[$connName]->connection);
 		return self::$instance[$connName]->connection;
 	}
 }

@@ -4,14 +4,9 @@
             spl_autoload_register(array($this, 'loader'));
         }
         private function loader($className) {
-			global $appDir;
-
-            //debugLog('Trying to load '. $className . ' via ' . __METHOD__ . "()");
 			if ( $className == "PHPMailer" ){
-				//debugLog("Loading PHPMailer");
 				$r = require_once(BREMA_DIR . "/phpmailer/class.phpmailer.php");
 				if ( $r === false ){
-					echo BREMA_DIR . "/phpmailer/class.phpmailer.php";
 					die("Unable to load class " . $className . " in Autoloader");
 				}
 				require_once(BREMA_DIR . "/phpmailer/class.smtp.php");
@@ -22,7 +17,8 @@
 					$className = implode("/", $parts);
 
 					// try loading the class from the APP_DIR first
-					$r = @include(APP_DIR . "/includes/classes/" . $className . ".class.php");
+                    $classDir = defined('MODEL_DIR') ? MODEL_DIR : APP_DIR . '/includes/classes';
+					$r = @include($classDir . '/' . $className . ".class.php");
 
 					// try loading the class from brema frame work using brema framework filename format
 					if ( $r === false ){

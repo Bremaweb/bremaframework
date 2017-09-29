@@ -1,32 +1,38 @@
 <?php
 
-class model_base {
+abstract class model_base {
 	public $id;
 	public $db;
 
 	protected $loaded = false;
 	protected $changed = false;
 	protected $table = null;
-	protected $columns = null;
 	protected $key = null;
 	protected $dbConnectionName = 'default';
 
 	private $data = array();
 	private $tableDefinition;
+	private $instanceGUID;
 
 	function __construct($_key="",$isGuid = false){
+        $this->instanceGUID = md5($this->table . $_key);
 		debugLog(get_class($this) . "->__construct($_key,$isGuid)",3);
+		debugLog("Instance GUID: " . $this->instanceGUID, 4);
+
 		$this->db = dbConnection::getConnection($this->dbConnectionName);
 
-		if ( $this->table === null ){
+		if ( empty($this->table) ){
 			$this->table = get_class($this);
 		}
 
 		$this->tableDefinition = new tableDefinition($this->table, $this->db);
 
+		if ( empty($this->key) ){
+			$this->key = $this->tableDefinition->getPrimaryKey();
+		}
+
 		if ( $_key != "" ){
 			if ( !$this->load($_key,$isGuid) ){
-
 				return false;
 			}
 		}
@@ -61,6 +67,11 @@ class model_base {
 		return $retVal;
 	}
 
+	public function delete(){
+	    $query = "DELETE FROM {$this->table} WHERE {$this->key} = {$this->id}";
+	    return $this->db->query($query);
+    }
+
 	protected function before_save(){}	// all functions with _ in their name are for backwards compatibility
 	protected function beforeSave(){ $this->before_save(); }
 	protected function after_save(){}
@@ -73,10 +84,11 @@ class model_base {
 	public function load($keyValue,$isGuid = false){
 		debugLog(get_class($this) . "->load($keyValue,$isGuid)",3);
 		debugLog("loading from " . $this->table . " " . $this->key . " " . $keyValue,4);
-		if ( ($this->data = $this->db->getRow($this->table, $this->columns, ($isGuid == true ? "guid" : $this->key), $keyValue)) !== false ){
+		if ( ($this->data = $this->db->getRow($this->table, $this->getColumns(), ($isGuid == true ? "guid" : $this->key), $keyValue)) !== false ){
 			$this->loaded=true;
-			$this->id = $this->data["{$this->key}"];
+			$this->id = $this->data[$this->key];
 			$this->afterLoad();
+            $this->instanceGUID = md5($this->table . $this->id);
 			return true;
 		} else {
 			$this->loaded=false;
@@ -87,10 +99,11 @@ class model_base {
 	public function queryLoad($params){
 		debugLog(get_class($this) . "->queryLoad()",3);
 		debugLog($params,3);
-		if ( ($this->data = $this->db->getRowQuery($this->table, $this->columns, $params) ) ){
+		if ( ($this->data = $this->db->getRowQuery($this->table, $this->getColumns(), $params) ) ){
 			$this->loaded=true;
 			$this->id = $this->data["{$this->key}"];
 			$this->afterLoad();
+            $this->instanceGUID = md5($this->table . $this->id);
 			return true;
 		} else {
 			$this->loaded=false;
@@ -100,22 +113,23 @@ class model_base {
 
 	public function __get($name){
 		debugLog(get_class($this) . "->_get($name)",4);
-		if ( array_key_exists($name,$this->data) )
+		if ( !empty($this->data[$name]) ){
 			return $this->data[$name];
-		else
-			return !empty($_SESSION[$this->table][$name]) ? $_SESSION[$this->table][$name] : false;
+        } else {
+			return !empty($_SESSION[$this->instanceGUID][$name]) ? $_SESSION[$this->instanceGUID][$name] : false;
+        }
 	}
 
 	public function __set($name,$val){
 		debugLog(get_class($this) . "->($name,$val)",4);
-		if ( array_key_exists($name,$this->data) || in_array($name,$this->columns) ){
+		if ( array_key_exists($name,$this->data) || in_array($name,$this->getColumns()) ){
 			//debugLog("database field");
 			$this->data[$name] = $val;
 			$this->changed = true;
 			//$this->save();
 		} else {
 			//debugLog("session field");
-			$_SESSION[$this->table][$name] = $val;
+			$_SESSION[$this->instanceGUID][$name] = $val;
 		}
 
 		//debugLog($this->data);
@@ -157,7 +171,7 @@ class model_base {
 		if ( !empty($this->form_details["$field_name"]['name']) ){
 			return $this->form_details["$field_name"]['name'];
 		} else {
-			if ( in_array($field_name,$this->columns) )
+			if ( in_array($field_name,$this->getColumns()) )
 				return $this->table . "[" . $field_name . "]";
 			else
 				return $field_name;
@@ -233,6 +247,14 @@ class model_base {
 
 		$form->render();
 	}
+
+	public function getColumns(){
+		return $this->tableDefinition->getColumns();
+	}
+
+	public function getData(){
+	    return $this->data;
+    }
 }
 
 ?>

@@ -56,33 +56,38 @@ class uriRouter {
 
 		  if ( $route !== false ){
 			$sRoute = self::$routes["{$route}"];
-
+			debugLog("Executing: " . $sRoute['controller'] . "/" . $sRoute['view'],4);
 			if ( !empty($sRoute['authenticate']) ){
 				if ( !authentication::authenticate() ){
+				    debugLog("Not authenticated",4);
 					return false;
 				}
 			}
 
 			if ( !empty($sRoute['permission']) ){
 				if ( !authentication::hasPermission($sRoute['permission']) ){
-					header("Status: 403 Forbidden");
+
+					header("HTTP/1.0 404 Forbidden");
 					echo "403 Forbidden<br />";
 					return false;
 				}
 			}
+			self::$params = explode("/",$requestURI);
+			$sRoute['view'] = str_replace(array("%0","%1","%2","%3","%4"),self::$params,$sRoute['view']);
 
 			if ( ( $sRoute['view'] == null || file_exists($view_dir . "/" . $sRoute['view'] . ".view.php") )
 					&& ( file_exists(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php")
 					|| file_exists(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php") )  ){
 
-				self::$params = explode("/",$requestURI);
+
 
 				@include(APP_DIR . "/includes/scripts.php");
 
 				$r = @include(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
 
-				if ( $r != 1 )
+				if ( $r != 1 ){
 					@include(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
+				}
 
 				if ( $sRoute['view'] != null ){
 					if ( file_exists($view_dir . DIRECTORY_SEPARATOR . "header.inc.php") && defined('NO_HEADER') !== true )
@@ -95,13 +100,15 @@ class uriRouter {
 				}
 
 			} else {
-				header("Status: 404 Not Found");
+			    debugLog("404 Not Found",4);
+				header("HTTP/1.0 404 Not Found");
 				echo "404 FILE NOT FOUND - Missing View or Controller - " . $sRoute['view'] . "/" . $sRoute['controller'] . "<br />";
 				return false;
 			}
 		  } else {
 			// undefined route
-				header("Status: 404 Not Found");
+                debugLog("404 Not Found",4);
+				header("HTTP/1.0 404 Not Found");
 				echo "404 FILE NOT FOUND - Undefined Route - " . $requestURI;
 				return false;
 		  }

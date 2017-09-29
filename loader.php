@@ -19,6 +19,8 @@ if ( defined('ROUTE_FILE') !== false ){
 	@include_once(APP_DIR . "/config/routes.php");
 }
 
-@include_once(APP_DIR . "/includes/app-init.php");
+if ( !defined('NO_USER') ){
+    authentication::initUser();
+}
 
 ?>

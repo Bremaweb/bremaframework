@@ -14,7 +14,7 @@ class permissions {
 		self::$_perms[$key] = self::$_nextNumber;
 		self::$_permById[self::$_nextNumber] = $key;
 
-		if ( !is_array(self::$_permGroups[$group]) ){
+		if ( empty(self::$_permGroups[$group]) ){
 			self::$_permGroups[$group] = array();
 		}
 

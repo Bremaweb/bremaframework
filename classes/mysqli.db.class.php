@@ -15,8 +15,8 @@ class db {
         $this->result = @mysqli_query($this->_dbconn, $SQL);
 
         if (!$this->result){
-        	debugLog(mysqli_error($this->_dbconn));
-            debugLog($SQL);
+        	debugLog(mysqli_error($this->_dbconn),1);
+            debugLog($SQL,1);
         }
 
         return $this->result;
@@ -62,8 +62,7 @@ class db {
     }
 
 	function affectedrows(){
-
-        return @mysqli_affected_rows();
+        return @mysqli_affected_rows($this->_dbconn);
     }
 
     function __destruct(){
@@ -88,8 +87,8 @@ class db {
 	}
 
     function insertRow($table, $values){
-    	debugLog("insertRow($table,$values);");
-    	debugLog($values);
+    	debugLog("insertRow($table,$values);",4);
+    	debugLog($values,4);
     	$columns = $this->getTableCols($table,false);
     	debugLog($columns);
         $SQL = "INSERT INTO $table (";

@@ -29,9 +29,11 @@ function debugLog($text,$level = 1){
 			fwrite($h, ($text . "\r\n") );
 			fclose($h);
 
-		if ($_SERVER['HTTP_HOST'] == ""){
+/*
+		if (empty($_SERVER['HTTP_HOST'])){
 			echo $text . "\r\n";
 		}
+*/
 	}
 
 
@@ -158,4 +160,7 @@ function time_elapsed_string($datetime, $full = false) {
 	return $string ? implode(', ', $string) . ' ago' : 'just now';
 }
 
+function is_post(){
+	return $_SERVER['REQUEST_METHOD'] == 'POST';
+}
 ?>
