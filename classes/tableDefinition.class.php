@@ -7,7 +7,6 @@ class tableDefinition {
 	private $db = null;
 
 	function __construct($table, $dbConnection){
-	    debugLog("tableDefinition::__construct($table)");
 		$this->table = $table;
 		$this->db = $dbConnection;
 		$this->getTableDefinition();

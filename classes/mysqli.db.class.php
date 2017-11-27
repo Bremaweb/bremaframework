@@ -11,7 +11,6 @@ class db {
     }
 
     function query($SQL, $displayErrors = true){
-    	debugLog("query($SQL)",4);
         $this->result = @mysqli_query($this->_dbconn, $SQL);
 
         if (!$this->result){
@@ -87,10 +86,7 @@ class db {
 	}
 
     function insertRow($table, $values){
-    	debugLog("insertRow($table,$values);",4);
-    	debugLog($values,4);
     	$columns = $this->getTableCols($table,false);
-    	debugLog($columns);
         $SQL = "INSERT INTO $table (";
         $SQLv = "";
         foreach ( $values as $k => $v ){
@@ -107,8 +103,6 @@ class db {
         $SQL = substr($SQL,0,strlen($SQL)-1);
 
         $SQL .= ")";
-
-        debugLog($SQL);
 
         $results = $this->query($SQL);
         if ( $results )
@@ -132,21 +126,14 @@ class db {
 	}
 
     function updateRow($table,$values,$key,$keyValue="",$columns = ""){
-		debugLog("updateRow();");
-    	debugLog($table);
 
 		if ( $columns == "" )
 			$columns = $this->getTableCols($table);
 
-    	debugLog($values);
-		debugLog($key);
-		debugLog($keyValue);
-		debugLog($columns);
+
     	$SQL = "UPDATE $table SET";
         foreach ( $values as $k => $v ){
-			debugLog($k);
             if ( in_array($k,$columns) && $k != $key ){
-            	debugLog("Add to SQL");
                 $SQL .= " $k = '" . $this->escape($v) . "',";
             } else if ( $k == $key ){
 				$keyValue = $v;
@@ -161,7 +148,6 @@ class db {
 
         $SQL .= " WHERE $key = '" . $this->escape($keyValue) . "'";
 
-		debugLog($SQL);
         $results = $this->query($SQL);
         if ( $results )
             return $keyValue;

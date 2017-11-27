@@ -56,17 +56,14 @@ class uriRouter {
 
 		  if ( $route !== false ){
 			$sRoute = self::$routes["{$route}"];
-			debugLog("Executing: " . $sRoute['controller'] . "/" . $sRoute['view'],4);
 			if ( !empty($sRoute['authenticate']) ){
 				if ( !authentication::authenticate() ){
-				    debugLog("Not authenticated",4);
 					return false;
 				}
 			}
 
 			if ( !empty($sRoute['permission']) ){
 				if ( !authentication::hasPermission($sRoute['permission']) ){
-
 					header("HTTP/1.0 404 Forbidden");
 					echo "403 Forbidden<br />";
 					return false;
@@ -78,8 +75,6 @@ class uriRouter {
 			if ( ( $sRoute['view'] == null || file_exists($view_dir . "/" . $sRoute['view'] . ".view.php") )
 					&& ( file_exists(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php")
 					|| file_exists(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php") )  ){
-
-
 
 				@include(APP_DIR . "/includes/scripts.php");
 
@@ -100,17 +95,15 @@ class uriRouter {
 				}
 
 			} else {
-			    debugLog("404 Not Found",4);
 				header("HTTP/1.0 404 Not Found");
 				echo "404 FILE NOT FOUND - Missing View or Controller - " . $sRoute['view'] . "/" . $sRoute['controller'] . "<br />";
 				return false;
 			}
 		  } else {
 			// undefined route
-                debugLog("404 Not Found",4);
-				header("HTTP/1.0 404 Not Found");
-				echo "404 FILE NOT FOUND - Undefined Route - " . $requestURI;
-				return false;
+            header("HTTP/1.0 404 Not Found");
+            echo "404 FILE NOT FOUND - Undefined Route - " . $requestURI;
+            return false;
 		  }
 	}
 

@@ -16,8 +16,6 @@ abstract class model_base {
 
 	function __construct($_key="",$isGuid = false){
         $this->instanceGUID = md5($this->table . $_key);
-		debugLog(get_class($this) . "->__construct($_key,$isGuid)",3);
-		debugLog("Instance GUID: " . $this->instanceGUID, 4);
 
 		$this->db = dbConnection::getConnection($this->dbConnectionName);
 
@@ -40,7 +38,6 @@ abstract class model_base {
 	}
 
 	public function save(){
-		debugLog(get_class($this) . "->save()",3);
 
 		$this->beforeSave();
 
@@ -48,10 +45,8 @@ abstract class model_base {
 			return false;
 
 		if ( $this->loaded == true ){
-			debugLog("loaded so updating",4);
 			$retVal = $this->db->updateRow($this->table, $this->data, $this->key, $this->id);
 		} else {
-			debugLog("no loaded so inserting",4);
 			if ( $this->db->insertRow($this->table, $this->data) !== false )
 				$this->loaded = true;
 			//$this->data["{$this->key}"] = $this->db->lastid();
@@ -63,7 +58,6 @@ abstract class model_base {
 		$this->afterSave();
 
 		$this->changed = false;
-		debugLog("RetVal: " . $retVal);
 		return $retVal;
 	}
 
@@ -82,8 +76,6 @@ abstract class model_base {
 	protected function afterConstruct($_key,$isGuid) { }
 
 	public function load($keyValue,$isGuid = false){
-		debugLog(get_class($this) . "->load($keyValue,$isGuid)",3);
-		debugLog("loading from " . $this->table . " " . $this->key . " " . $keyValue,4);
 		if ( ($this->data = $this->db->getRow($this->table, $this->getColumns(), ($isGuid == true ? "guid" : $this->key), $keyValue)) !== false ){
 			$this->loaded=true;
 			$this->id = $this->data[$this->key];
@@ -97,8 +89,6 @@ abstract class model_base {
 	}
 
 	public function queryLoad($params){
-		debugLog(get_class($this) . "->queryLoad()",3);
-		debugLog($params,3);
 		if ( ($this->data = $this->db->getRowQuery($this->table, $this->getColumns(), $params) ) ){
 			$this->loaded=true;
 			$this->id = $this->data["{$this->key}"];
@@ -112,7 +102,6 @@ abstract class model_base {
 	}
 
 	public function __get($name){
-		debugLog(get_class($this) . "->_get($name)",4);
 		if ( !empty($this->data[$name]) ){
 			return $this->data[$name];
         } else {
@@ -121,7 +110,6 @@ abstract class model_base {
 	}
 
 	public function __set($name,$val){
-		debugLog(get_class($this) . "->($name,$val)",4);
 		if ( array_key_exists($name,$this->data) || in_array($name,$this->getColumns()) ){
 			//debugLog("database field");
 			$this->data[$name] = $val;

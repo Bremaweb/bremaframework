@@ -32,7 +32,6 @@ class authentication {
 	}
 
 	public static function authenticate(){
-		debugLog("authentication::authenticate",3);
 		$slic = STAY_LOGGED_IN_COOKIE;
 		if ( static::$user->logged_in == false && ( !isset($_COOKIE["{$slic}"]) || $_COOKIE["{$slic}"] != static::$user->getKeyValue() ) ){
 			header("location: " . LOGIN_URL . "?redirect=" . $_SERVER['REQUEST_URI']);
@@ -57,9 +56,7 @@ class authentication {
 	}
 
 	public static function login($username,$password){
-		debugLog("login($username,$password)",3);
 		$SQL = "SELECT user_id FROM users WHERE `" . static::$user->getUsernameField() . "` = '" . static::$user->db->escape( $username ) . "' AND " . ( static::$user->password_field != null ? static::$user->password_field : "user_password" ) . " = '" . md5($password) . "'";
-		debugLog($SQL,3);
 		$r = static::$user->db->query($SQL);
 		if ( static::$user->db->numrows($r) > 0 ){
 			$row = static::$user->db->fetchrow($r);
@@ -73,7 +70,6 @@ class authentication {
 				}
 			}
 			$_SESSION['user_id'] = $row['user_id'];
-			debugLog($_SESSION);
 			static::$user->logged_in = true;
 			return true;
 		} else {

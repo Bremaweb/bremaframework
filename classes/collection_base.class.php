@@ -8,20 +8,15 @@ class collection_base {
 	protected static $db;
 
 	protected static function getDb(){
-        debugLog(static::class . '::getDb',4);
 		if ( empty(static::$db) ){
-		    debugLog("Establishing a new connection (" . static::$dbConnectionName . ")",4);
 			static::$db = dbConnection::getConnection(static::$dbConnectionName);
 		}
 		return static::$db;
 	}
 
 	protected static function getTableDef(){
-	    debugLog(get_called_class() . '::getTableDef',4);
-	    debugLog(static::$tableDef);
 		self::getTable();
 		if ( empty(static::$tableDef) ){
-		    debugLog("not set");
 			static::$tableDef = new tableDefinition(static::$table, self::getDb());
 		}
 		return static::$tableDef;
@@ -35,13 +30,23 @@ class collection_base {
     }
 
 
-	public static function getAllWhere($where){
-
+	public static function getAllWhere($where, $orderByField = null, $orderBy = null){
+        $db = self::getDb();
+        $results = $db->query('SELECT * FROM ' . self::getTable() . ' WHERE ' . $where . ( $orderByField != null & $orderBy != null ? $orderByField . ' ' . $orderBy : '' ));
+        $rows = array();
+        while ( $row = $db->fetchRow($results) ){
+            $rows[] = $row;
+        }
+        return $rows;
 	}
 
+	public static function getOneWhere($where, $orderByField = null, $orderBy = null){
+	    $db = self::getDb();
+        $results = $db->query('SELECT * FROM ' . self::getTable() . ' WHERE ' . $where . ( $orderByField != null & $orderBy != null ? $orderByField . ' ' . $orderBy : '' ) . ' LIMIT 1');
+        return $db->fetchrow($results);
+    }
+
 	public static function add($data){
-	    debugLog(get_called_class() . '::add',4);
-	    debugLog($data,4);
 		$fields = array();
 		$values = array();
 		foreach ( $data as $field => $value ){
@@ -60,7 +65,6 @@ class collection_base {
 	}
 
 	public static function update($id, $data, $keyField = null){
-        debugLog(get_called_class() . '::update',4);
         $keyField = $keyField == null ? self::getTableDef()->getPrimaryKey() : $keyField;
         $sets = array();
         foreach ( $data as $field => $value ){
