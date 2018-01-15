@@ -7,6 +7,9 @@ class collection_base {
 	protected static $tableDef = null;
 	protected static $db;
 
+    /**
+     * @return db
+     */
 	protected static function getDb(){
 		if ( empty(static::$db) ){
 			static::$db = dbConnection::getConnection(static::$dbConnectionName);
@@ -14,6 +17,9 @@ class collection_base {
 		return static::$db;
 	}
 
+    /**
+     * @return tableDefinition
+     */
 	protected static function getTableDef(){
 		self::getTable();
 		if ( empty(static::$tableDef) ){
@@ -22,6 +28,9 @@ class collection_base {
 		return static::$tableDef;
 	}
 
+    /**
+     * @return string
+     */
 	protected static function getTable(){
         if ( static::$table === null ){
             static::$table = str_replace("Collection","",get_called_class());
@@ -30,6 +39,12 @@ class collection_base {
     }
 
 
+    /**
+     * @param string $where
+     * @param string $orderByField
+     * @param string $orderBy
+     * @return array
+     */
 	public static function getAllWhere($where, $orderByField = null, $orderBy = null){
         $db = self::getDb();
         $results = $db->query('SELECT * FROM ' . self::getTable() . ' WHERE ' . $where . ( $orderByField != null & $orderBy != null ? $orderByField . ' ' . $orderBy : '' ));
@@ -40,12 +55,22 @@ class collection_base {
         return $rows;
 	}
 
+    /**
+     * @param string $where
+     * @param string $orderByField
+     * @param string $orderBy
+     * @return array|null
+     */
 	public static function getOneWhere($where, $orderByField = null, $orderBy = null){
 	    $db = self::getDb();
         $results = $db->query('SELECT * FROM ' . self::getTable() . ' WHERE ' . $where . ( $orderByField != null & $orderBy != null ? $orderByField . ' ' . $orderBy : '' ) . ' LIMIT 1');
         return $db->fetchrow($results);
     }
 
+    /**
+     * @param array $data
+     * @return bool|int|null|string
+     */
 	public static function add($data){
 		$fields = array();
 		$values = array();
@@ -64,6 +89,12 @@ class collection_base {
         return false;
 	}
 
+    /**
+     * @param string $id
+     * @param array $data
+     * @param string $keyField
+     * @return bool
+     */
 	public static function update($id, $data, $keyField = null){
         $keyField = $keyField == null ? self::getTableDef()->getPrimaryKey() : $keyField;
         $sets = array();
@@ -82,11 +113,21 @@ class collection_base {
         return false;
     }
 
+    /**
+     * @param string $id
+     * @return bool|mysqli_result|resource|string
+     */
 	public static function deleteById($id){
 	    $query = "DELETE FROM " . static::$table . " WHERE " . self::getTableDef()->getPrimaryKey() . " = '" . self::getDb()->escape($id) . "'";
 	    return self::getDb()->query($query);
     }
 
+    /**
+     * @param string $field
+     * @param string $value
+     * @param bool|int $limit
+     * @return bool|mysqli_result|resource|string
+     */
     public static function deleteByField($field, $value, $limit = false){
         $query = "DELETE FROM " . static::$table . " WHERE `{$field}` = '" . self::getDb()->escape($value) . "'";
         if ( $limit !== false && is_numeric($limit)){
@@ -95,6 +136,11 @@ class collection_base {
         return self::getDb()->query($query);
     }
 
+    /**
+     * @param string $field
+     * @param string $value
+     * @return array
+     */
     public static function getByField($field, $value){
         $query = "SELECT * FROM " . static::$table . " WHERE `" . $field . "` = '" . self::getDb()->escape($value) . "'";
         $results = self::getDb()->query($query);
@@ -103,5 +149,13 @@ class collection_base {
             $rows[] = $row;
         }
         return $rows;
+    }
+
+    /**
+     * @param db $dbConnection
+     */
+    public static function setDbConnection(db $dbConnection){
+        debugLog($dbConnection);
+        static::$db = $dbConnection;
     }
 }

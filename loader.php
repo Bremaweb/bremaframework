@@ -23,4 +23,6 @@ if ( !defined('NO_USER') ){
     authentication::initUser();
 }
 
+@include_once(APP_DIR . "/includes/app_init.php");
+
 ?>

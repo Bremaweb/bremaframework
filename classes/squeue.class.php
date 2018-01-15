@@ -1,12 +1,25 @@
 <?php
 class squeue {
 	private $scripts = array();
+	private static $instances = array();
 
 	private $type = "";
 
-	function __construct($type){
+	private function __construct($type){
 		$this->type = $type;
 	}
+
+    /**
+     * @param $type
+     * @return squeue
+     */
+	public static function getInstance($type){
+	    if ( empty(static::$instances[$type]) ){
+	        static::$instances[$type] = new squeue($type);
+        }
+        return static::$instances[$type];
+    }
+
 	// pass the full url of the script
 	function enqueue($script){
 		// this will check to see if it has already been enqueued
@@ -22,12 +35,13 @@ class squeue {
 		$this->enqueue($script);
 	}
 
-	function generate(){
-		foreach ( $this->scripts as $k => $s ){
-			if ( $this->type == "javascript" )
+	public static function generate($type){
+	    $instance = self::getInstance($type);
+		foreach ( $instance->scripts as $k => $s ){
+			if ( $instance->type == "javascript" )
 				echo "<script type=\"text/javascript\" src=\"" . $s . "\"></script>\r\n";
 
-			if ( $this->type == "css" )
+			if ( $instance->type == "css" )
 				echo "<link rel=\"stylesheet\" href=\"" . $s . "\" />\r\n";
 		}
 	}

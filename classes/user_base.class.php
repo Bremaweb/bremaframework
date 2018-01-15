@@ -4,6 +4,10 @@ abstract class user_base extends model_base {
 	protected $username_field = "user_name";
 	protected $password_field = null;
 
+	public function __construct($_key = '', $isGuid = false){
+	    parent::__construct($_key, $isGuid);
+    }
+
 	static function verify($verifyCode){
 		global $db;
 		$SQL = "SELECT user_id FROM users WHERE user_verifycode = '" . $db->escape($verifyCode) . "'";
@@ -23,21 +27,33 @@ abstract class user_base extends model_base {
 		}
 	}
 
-	function destruct(){
+	public function destruct(){
 		unset($_SESSION['error']);
 	}
 
-	function getPasswordField(){
+	public function getPasswordField(){
 		return $this->password_field;
 	}
 
-	function getUsernameField(){
+	public function getUsernameField(){
 		return $this->username_field;
 	}
 
-	function loggedIn(){
+	public function loggedIn(){
 		return $this->logged_in;
 	}
+
+	public function hashPassword($password){
+	    return md5($password);
+    }
+
+    public function getPermissions(){
+	    return 0;
+    }
+
+    public function hasPermission($permName){
+        return (( $this->getPermissions() & permissions::get($permName) ) == permissions::get($permName));
+    }
 
 }
 

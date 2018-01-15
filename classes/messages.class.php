@@ -1,30 +1,42 @@
 <?php
 
 class messages {
+    /**
+     * @param $message
+     */
     public static function message($message){
         if ( empty($_SESSION['messages']) ){
             $_SESSION['messages'] = array();
         }
         $_SESSION['messages'][] = $message;
     }
+
+    /**
+     * @param $message
+     */
     public static function error($message){
         if ( empty($_SESSION['errors']) ){
             $_SESSION['errors'] = array();
         }
         $_SESSION['errors'][] = $message;
     }
-    public static function display(){
+
+    /**
+     * @param string $pre
+     * @param string $post
+     */
+    public static function display($pre = "", $post = ""){
         if ( !empty($_SESSION['messages']) ){
             foreach ( $_SESSION['messages'] as $message ){
-                echo "<div class='alert alert-success text-center'>" . $message . "</div>";
+                echo $pre . "<div class='alert alert-success text-center'>" . $message . "</div>" . $post;
             }
-            unset($_SESSION['messages']);
+            $_SESSION['messages'] = array();
         }
         if ( !empty($_SESSION['errors']) ){
             foreach ( $_SESSION['errors'] as $error ){
-                echo "<div class='alert alert-danger text-center'>" . $error . "</div>";
+                echo $pre . "<div class='alert alert-danger text-center'>" . $error . "</div>" . $post;
             }
-            unset($_SESSION['errors']);
+            $_SESSION['errors'] = array();
         }
     }
 }

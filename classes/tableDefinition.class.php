@@ -21,6 +21,15 @@ class tableDefinition {
                 if ( $row['Key'] == 'PRI' ){
                     $this->primaryKey = $row['Field'];
                 }
+                if ( substr($row['Type'],0,4) == 'enum' ){
+                    $vals = substr($row['Type'],6,strlen($row['Type'])-8);
+                    $vals = explode('\',\'', $vals);
+                    $vResults = array();
+                    foreach ( $vals as $val ){
+                        $vResults[] = array('text' => ucwords($val), 'value' => $val);
+                    }
+                    $this->tableDef[$row['Field']]['enum_vals'] = $vResults;
+                }
             }
             cache::set('tableDef:' . $this->table, array('fields' => $this->tableDef, 'key' => $this->primaryKey));
         } else {
@@ -40,4 +49,8 @@ class tableDefinition {
 	public function getColumns(){
 		return array_keys($this->tableDef);
 	}
+
+	public function getEnumVals($field){
+	    return !empty($this->tableDef[$field]['enum_vals']) ? $this->tableDef[$field]['enum_vals'] : false;
+    }
 }

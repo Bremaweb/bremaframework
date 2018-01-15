@@ -4,12 +4,26 @@ class db {
 
     private $result = "";
 	private $_dbconn;
+
+    /**
+     * db constructor.
+     * @param $host
+     * @param $port
+     * @param $database
+     * @param $user
+     * @param $password
+     */
     function __construct($host, $port, $database, $user, $password){	// original parameters ($dbHost,$dbPort,$dbDatabase,$dbUser,$dbPassword)
     	    $this->_dbconn = mysqli_connect($host,$user,$password,$database,$port);
 			if ( !$this->_dbconn )
 				die("Unable to connect to database..." . mysqli_error($this->_dbconn));
     }
 
+    /**
+     * @param $SQL
+     * @param bool $displayErrors
+     * @return bool|mysqli_result|string
+     */
     function query($SQL, $displayErrors = true){
         $this->result = @mysqli_query($this->_dbconn, $SQL);
 
@@ -21,6 +35,11 @@ class db {
         return $this->result;
     }
 
+    /**
+     * @param $SQL
+     * @param bool $displayErrors
+     * @return array|bool|null
+     */
     function queryrow($SQL, $displayErrors = true){
         // queryrow does the query and just returns one row
         $result = $this->query($SQL, $displayErrors);
@@ -68,6 +87,11 @@ class db {
         mysqli_close($this->_dbconn);
     }
 
+    /**
+     * @param $SQL
+     * @param bool $optionArray
+     * @return array|bool
+     */
 	function getRows($SQL,$optionArray=false){
 		$results = $this->query($SQL);
 
@@ -190,6 +214,10 @@ class db {
 		$SQL .= " WHERE " . implode("AND ", $p2);
 		return $this->query($SQL);
 	}
+
+	public function seek($offset){
+	    mysqli_data_seek($this->result, $offset);
+    }
 }
 
 ?>

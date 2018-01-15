@@ -13,11 +13,17 @@ abstract class model_base {
 	private $data = array();
 	private $tableDefinition;
 	private $instanceGUID;
+	private $lastError = null;
 
-	function __construct($_key="",$isGuid = false){
+    /**
+     * model_base constructor.
+     * @param string $_key
+     * @param bool $isGuid
+     */
+	public function __construct($_key="",$isGuid = false, $connectionName = null){
         $this->instanceGUID = md5($this->table . $_key);
 
-		$this->db = dbConnection::getConnection($this->dbConnectionName);
+		$this->db = dbConnection::getConnection(!empty($connectionName) ? $connectionName : $this->dbConnectionName);
 
 		if ( empty($this->table) ){
 			$this->table = get_class($this);
@@ -37,6 +43,9 @@ abstract class model_base {
 		$this->afterConstruct($_key,$isGuid);
 	}
 
+    /**
+     * @return bool
+     */
 	public function save(){
 
 		$this->beforeSave();
@@ -61,6 +70,9 @@ abstract class model_base {
 		return $retVal;
 	}
 
+    /**
+     * @return mixed
+     */
 	public function delete(){
 	    $query = "DELETE FROM {$this->table} WHERE {$this->key} = {$this->id}";
 	    return $this->db->query($query);
@@ -100,6 +112,10 @@ abstract class model_base {
 			return false;
 		}
 	}
+
+	public function __isset($name){
+	    return isset($this->data[$name]);
+    }
 
 	public function __get($name){
 		if ( !empty($this->data[$name]) ){
@@ -242,6 +258,18 @@ abstract class model_base {
 
 	public function getData(){
 	    return $this->data;
+    }
+
+    public function getEnumValues($field){
+	    return $this->tableDefinition->getEnumVals($field);
+    }
+
+    public function setError($error){
+        $this->lastError = $error;
+    }
+
+    public function getError(){
+        return $this->lastError;
     }
 }
 

@@ -6,6 +6,13 @@ class uriRouter {
 
 	public static $params = array();
 
+    /**
+     * @param string $uri
+     * @param string $controller
+     * @param string $view
+     * @param bool $requireAuthentication
+     * @param int $requirePermission
+     */
 	public static function routeAdd($uri,$controller,$view = null, $requireAuthentication = false, $requirePermission = null){
 		if ( empty($view) )
 			$view = $controller;

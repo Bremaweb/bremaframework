@@ -163,4 +163,31 @@ function time_elapsed_string($datetime, $full = false) {
 function is_post(){
 	return $_SERVER['REQUEST_METHOD'] == 'POST';
 }
-?>
+
+function is_ajax(){
+    return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+}
+
+function value($var, $index, $default = null){
+    if ( is_object($var) ){
+        if ( !empty($var->$index) ){
+            return $var->$index;
+        }
+    } else {
+        if ( !empty($var[$index]) ){
+            return $var[$index];
+        }
+    }
+    return $default;
+}
+
+function getPage(){
+    return !empty($_GET['page']) ? $_GET['page'] : 0;
+}
+
+function redirect($url){
+    header('location: ' . $url);
+    exit;
+}
+
+

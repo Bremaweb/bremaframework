@@ -4,6 +4,10 @@ class dbConnection {
 	private static $instance = array();
 	protected $connection = null;
 
+    /**
+     * dbConnection constructor.
+     * @param $connName
+     */
 	private function __construct($connName){
 		if ( dbConnectionsDef::defExists($connName) ){
 			$def = dbConnectionsDef::getConnectionDef($connName);
@@ -16,7 +20,12 @@ class dbConnection {
 		}
 	}
 
+    /**
+     * @param string $connName
+     * @return dbConnection
+     */
 	public static function getConnection($connName = 'default'){
+	    debugLog($connName);
 		if ( !empty(self::$instance[$connName]) ){
 			return self::$instance[$connName]->connection;
 		} else {

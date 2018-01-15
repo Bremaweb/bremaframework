@@ -11,6 +11,9 @@ class authentication {
 		static::$user = new user(!empty($_SESSION['user_id']) ? $_SESSION['user_id'] : '');
 	}
 
+    /**
+     * @return user
+     */
 	public static function getUser(){
 		return static::$user;
 	}
@@ -28,7 +31,7 @@ class authentication {
 	}
 
 	public static function hasPermission($permName){
-        return (( authentication::getUser()->user_permissions & permissions::get($permName) ) == permissions::get($permName));
+        return authentication::getUser()->hasPermission($permName);
 	}
 
 	public static function authenticate(){
@@ -56,11 +59,11 @@ class authentication {
 	}
 
 	public static function login($username,$password){
-		$SQL = "SELECT user_id FROM users WHERE `" . static::$user->getUsernameField() . "` = '" . static::$user->db->escape( $username ) . "' AND " . ( static::$user->password_field != null ? static::$user->password_field : "user_password" ) . " = '" . md5($password) . "'";
+		$SQL = "SELECT " . static::$user->getKey() . " as pkey FROM users WHERE `" . static::$user->getUsernameField() . "` = '" . static::$user->db->escape( $username ) . "' AND " . static::$user->getPasswordField() . " = '" . static::$user->hashPassword($password) . "'";
 		$r = static::$user->db->query($SQL);
 		if ( static::$user->db->numrows($r) > 0 ){
 			$row = static::$user->db->fetchrow($r);
-			static::$user->load($row['user_id']);
+			static::$user->load($row['pkey']);
 			if ( in_array("user_verified",static::$user->getColumns()) ){
 				if ( static::$user->user_verified != 1 ){
 					debugLog('not verified',2);
@@ -69,7 +72,7 @@ class authentication {
 					return false;
 				}
 			}
-			$_SESSION['user_id'] = $row['user_id'];
+			$_SESSION['user_id'] = $row['pkey'];
 			static::$user->logged_in = true;
 			return true;
 		} else {
