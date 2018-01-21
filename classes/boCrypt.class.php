@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Class boCrypt
+ * A very basic key based encryption class
+ */
 
 class boCrypt {
     private $_key = null;
@@ -8,6 +12,11 @@ class boCrypt {
         $this->_key = $key;
     }
 
+    /**
+     * @param string $data
+     * @param int $saltLevel
+     * @return string
+     */
     public function encrypt($data, $saltLevel = 30){
         $k = 0;
         $sK = str_split($this->_key,1);
@@ -29,6 +38,10 @@ class boCrypt {
         return base64_encode($nData);
     }
 
+    /**
+     * @param string $data
+     * @return string
+     */
     public function decrypt($data){
         $k = 0;
         $sK = str_split($this->_key,1);
@@ -49,6 +62,11 @@ class boCrypt {
         return $nData;
     }
 
+    /**
+     * @param string $data
+     * @param int $level
+     * @return string
+     */
     private function salt($data, $level){
         if ( $level < 10 ){
             $level = 10;
@@ -89,6 +107,10 @@ class boCrypt {
         return $nData;
     }
 
+    /**
+     * @param string $data
+     * @return string
+     */
     private function unsalt($data){
         $nullPos = strpos($data,chr(0));
         if ( $nullPos !== false && $nullPos > 9 && $nullPos < 61 ){
@@ -100,10 +122,20 @@ class boCrypt {
         }
     }
 
+    /**
+     * @param int $char
+     * @param int $keyChar
+     * @return int
+     */
     private function math($char, $keyChar){
         return $char + ($keyChar + 127 + (255 % $keyChar));
     }
 
+    /**
+     * @param int $char
+     * @param int $keyChar
+     * @return int
+     */
     private function unmath($char, $keyChar){
         return $char - ($keyChar + 127 + (255 % $keyChar));
     }
