@@ -25,7 +25,6 @@ class dbConnection {
      * @return dbConnection
      */
 	public static function getConnection($connName = 'default'){
-	    debugLog($connName);
 		if ( !empty(self::$instance[$connName]) ){
 			return self::$instance[$connName]->connection;
 		} else {

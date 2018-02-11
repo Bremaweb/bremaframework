@@ -75,9 +75,7 @@ class collection_base {
 		$fields = array();
 		$values = array();
 		foreach ( $data as $field => $value ){
-		    debugLog($field . "=>" . $value,4);
 			if ( self::getTableDef()->fieldExists($field) && !in_array($field, $fields) ){
-			    debugLog("added");
 				$fields[] = $field;
 				$values[] = self::getDb()->escape($value);
 			}
@@ -152,10 +150,27 @@ class collection_base {
     }
 
     /**
+     * @param null $order
+     * @param null $limit
+     * @return array|bool
+     */
+    public static function getAll($order = null, $limit = null){
+       $query = "SELECT * FROM " . self::getTable();
+       if ( $order !== null ){
+            $query .= ' ORDER BY ' . $order;
+       }
+
+       if ( $limit !== null ){
+            $query .= ' LIMIT ' . $limit;
+       }
+
+       return self::getDb()->getRows($query);
+    }
+
+    /**
      * @param db $dbConnection
      */
     public static function setDbConnection(db $dbConnection){
-        debugLog($dbConnection);
         static::$db = $dbConnection;
     }
 }

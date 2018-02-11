@@ -66,7 +66,6 @@ class authentication {
 			static::$user->load($row['pkey']);
 			if ( in_array("user_verified",static::$user->getColumns()) ){
 				if ( static::$user->user_verified != 1 ){
-					debugLog('not verified',2);
 					$_SESSION['error'] = "Email address not verified";
 					static::$user->logged_in = false;
 					return false;

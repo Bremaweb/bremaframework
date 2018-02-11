@@ -190,4 +190,7 @@ function redirect($url){
     exit;
 }
 
+function bEncrypt($data){
 
+
+}
