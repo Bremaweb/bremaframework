@@ -118,10 +118,10 @@ abstract class model_base {
     }
 
 	public function __get($name){
-		if ( !empty($this->data[$name]) ){
+		if ( isset($this->data[$name]) ){
 			return $this->data[$name];
         } else {
-			return !empty($_SESSION[$this->instanceGUID][$name]) ? $_SESSION[$this->instanceGUID][$name] : false;
+			return isset($_SESSION[$this->instanceGUID][$name]) ? $_SESSION[$this->instanceGUID][$name] : false;
         }
 	}
 

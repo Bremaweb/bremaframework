@@ -19,7 +19,9 @@ function html_select($aryParams) {
 	}
 	if ( is_array($attributes) ) {
 		foreach ( $attributes as $key => $v ) {
-			$retVal .= $key . "=\"$v\" ";
+			if ( $v !== null ){
+				$retVal .= $key . "=\"$v\" ";
+			}
 		}
 	}
 

@@ -28,12 +28,11 @@ class stripeToolbox {
      */
     public function getCustomer($id){
         try {
-            $customer = \Stripe\Customer::retrieve($id);
+            return \Stripe\Customer::retrieve($id);
         } catch ( Exception $e ){
             $this->_error = $e->getMessage();
             return false;
         }
-        return $customer;
     }
 
     /**
