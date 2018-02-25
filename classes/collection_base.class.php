@@ -139,8 +139,11 @@ class collection_base {
      * @param string $value
      * @return array
      */
-    public static function getByField($field, $value){
+    public static function getByField($field, $value, $order = null){
         $query = "SELECT * FROM " . static::$table . " WHERE `" . $field . "` = '" . self::getDb()->escape($value) . "'";
+        if ( !empty($order) ){
+            $query .= ' ORDER BY ' . $order;
+        }
         $results = self::getDb()->query($query);
         $rows = array();
         while ( $row = self::getDb()->fetchRow($results) ){
