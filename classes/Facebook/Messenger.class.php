@@ -145,7 +145,7 @@ class Messenger {
      * @return string
      */
     private function _buildUrl($endPoint){
-        return GRAPH_URL . $endPoint . ( stripos("?", $endPoint) !== false ? "&" : "?" ) . "access_token=" . $this->_token;
+        return GRAPH_URL . $endPoint . ( stripos($endPoint, "?") !== false ? "&" : "?" ) . "access_token=" . $this->_token;
     }
 
 }
