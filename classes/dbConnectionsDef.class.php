@@ -2,8 +2,10 @@
 
 class dbConnectionsDef {
 	private static $definitions = array();
+	private static $hasMaster = false;
+	private static $masterName = null;
 
-	public static function addConnectionDef($defName, $dbName, $dbHost, $dbPort, $dbUsername, $dbPassword, $dbType = "mysqli"){
+	public static function addConnectionDef($defName, $dbName, $dbHost, $dbPort, $dbUsername, $dbPassword, $dbType = "mysqli", $master = false){
 		self::$definitions[$defName] = array(
 				'dbName' => $dbName,
 				'dbHost' => $dbHost,
@@ -12,6 +14,11 @@ class dbConnectionsDef {
 				'dbPassword' => $dbPassword,
 				'dbType' => $dbType
 				);
+
+		if ( $master ){
+		    static::$hasMaster = true;
+		    static::$masterName = $defName;
+        }
 	}
 
 	public static function getConnectionDef($defName){
@@ -25,4 +32,18 @@ class dbConnectionsDef {
 	public static function defExists($defName){
 		return !empty(self::$definitions[$defName]);
 	}
+
+    /**
+     * @return bool
+     */
+	public static function hasMasterConnection(){
+	    return static::$hasMaster;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getMasterConnectionId(){
+	    return static::$masterName;
+    }
 }

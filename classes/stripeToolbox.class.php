@@ -19,7 +19,12 @@ class stripeToolbox {
      * @return \Stripe\Customer
      */
     public function createCustomer($cData){
-        return \Stripe\Customer::create($cData);
+        try {
+            return \Stripe\Customer::create($cData);
+        } catch ( Exception $e ){
+            $this->_error = $e->getMessage();
+            return false;
+        }
     }
 
     /**
@@ -203,5 +208,39 @@ class stripeToolbox {
      */
     public function getBalance(){
         return \Stripe\Balance::retrieve();
+    }
+
+    /**
+     * @param $amount
+     * @param $source
+     * @param $email
+     * @param $title
+     * @param string $currency
+     * @return bool|\Stripe\Charge
+     */
+    public function createCharge($amount, $source, $email, $title, $currency = 'usd'){
+        try {
+            $chargeData = array(
+                'amount' => $amount,
+                'currency' => $currency,
+                'description' => $title,
+                'receipt_email' => $email,
+                'statement_descriptor' => $title
+            );
+
+            if ( is_object($source) && !empty($source->id) ){
+                $chargeData['customer'] = $source->id;
+            } else if ( is_string($source) ) {
+                $chargeData['source'] = $source;
+            } else {
+                throw new Exception('Invalid source');
+            }
+
+            $charge = \Stripe\Charge::create($chargeData);
+            return $charge;
+        } catch ( Exception $e ){
+           $this->_error = $e->getMessage();
+           return false;
+        }
     }
 }

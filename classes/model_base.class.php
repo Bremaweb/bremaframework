@@ -3,6 +3,7 @@
 abstract class model_base {
 	public $id;
 	public $db;
+	public $wDb;
 
 	protected $loaded = false;
 	protected $changed = false;
@@ -24,6 +25,11 @@ abstract class model_base {
         $this->instanceGUID = md5($this->table . $_key);
 
 		$this->db = dbConnection::getConnection(!empty($connectionName) ? $connectionName : $this->dbConnectionName);
+		if ( dbConnectionsDef::hasMasterConnection() ){
+		    $this->wDb = dbConnection::getConnection(dbConnectionDef::getMasterConnectionId());
+        } else {
+		    $this->wDb = $this->db;
+        }
 
 		if ( empty($this->table) ){
 			$this->table = get_class($this);
@@ -54,12 +60,12 @@ abstract class model_base {
 			return false;
 
 		if ( $this->loaded == true ){
-			$retVal = $this->db->updateRow($this->table, $this->data, $this->key, $this->id);
+			$retVal = $this->wDb->updateRow($this->table, $this->data, $this->key, $this->id);
 		} else {
-			if ( $this->db->insertRow($this->table, $this->data) !== false )
+			if ( $this->wDb->insertRow($this->table, $this->data) !== false )
 				$this->loaded = true;
 			//$this->data["{$this->key}"] = $this->db->lastid();
-			$retVal = $this->db->lastid();
+			$retVal = $this->wDb->lastid();
 			$this->id = $retVal;
 			$this->data["{$this->key}"] = $retVal;
 		}
@@ -75,7 +81,7 @@ abstract class model_base {
      */
 	public function delete(){
 	    $query = "DELETE FROM {$this->table} WHERE {$this->key} = {$this->id}";
-	    return $this->db->query($query);
+	    return $this->wDb->query($query);
     }
 
 	protected function before_save(){}	// all functions with _ in their name are for backwards compatibility

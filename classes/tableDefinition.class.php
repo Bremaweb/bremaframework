@@ -31,7 +31,7 @@ class tableDefinition {
                     $this->tableDef[$row['Field']]['enum_vals'] = $vResults;
                 }
             }
-            cache::set('tableDef:' . $this->table, array('fields' => $this->tableDef, 'key' => $this->primaryKey));
+            cache::set('tableDef:' . $this->table, array('fields' => $this->tableDef, 'key' => $this->primaryKey), 86400);
         } else {
             $this->tableDef = $cachedDef['fields'];
             $this->primaryKey = $cachedDef['key'];

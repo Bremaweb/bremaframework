@@ -6,6 +6,7 @@ class collection_base {
 	protected static $table = null;
 	protected static $tableDef = null;
 	protected static $db;
+	protected static $wDb;
 
     /**
      * @return db
@@ -16,6 +17,20 @@ class collection_base {
 		}
 		return static::$db;
 	}
+
+    /**
+     * @return db
+     */
+	protected static function getwDb(){
+        if ( empty(static::$wDb) ){
+            if ( dbConnectionsDef::hasMasterConnection() ){
+                static::$wDb = dbConnection::getConnection(dbConnectionsDef::getMasterConnectionId());
+            } else {
+                return self::getDb();
+            }
+        }
+        return static::$wDb;
+    }
 
     /**
      * @return tableDefinition
@@ -77,12 +92,12 @@ class collection_base {
 		foreach ( $data as $field => $value ){
 			if ( self::getTableDef()->fieldExists($field) && !in_array($field, $fields) ){
 				$fields[] = $field;
-				$values[] = self::getDb()->escape($value);
+				$values[] = self::getwDb()->escape($value);
 			}
 		}
 		$query = "INSERT INTO " . static::$table . " (" . implode(",",$fields) . ") values('" . implode("','", $values) . "');";
-		if ( self::getDb()->query($query) ){
-		    return self::getDb()->lastid();
+		if ( self::getwDb()->query($query) ){
+		    return self::getwDb()->lastid();
         }
         return false;
 	}
@@ -98,13 +113,13 @@ class collection_base {
         $sets = array();
         foreach ( $data as $field => $value ){
             if ( self::getTableDef()->fieldExists($field) ){
-                $sets[] = "`" . $field . "` = '" . self::getDb()->escape($value) . "'";
+                $sets[] = "`" . $field . "` = '" . self::getwDb()->escape($value) . "'";
             }
         }
 
         if ( !empty($sets) ){
             $query = "UPDATE " . static::$table . " SET " . implode(",",$sets) . " WHERE " . $keyField . " = '" . self::getDb()->escape($id) . "'";
-            if ( self::getDb()->query($query) ){
+            if ( self::getwDb()->query($query) ){
                 return true;
             }
         }
@@ -117,7 +132,16 @@ class collection_base {
      */
 	public static function deleteById($id){
 	    $query = "DELETE FROM " . static::$table . " WHERE " . self::getTableDef()->getPrimaryKey() . " = '" . self::getDb()->escape($id) . "'";
-	    return self::getDb()->query($query);
+	    return self::getwDb()->query($query);
+    }
+
+    /**
+     * @param $id
+     * @return array|bool|null
+     */
+    public static function getById($id){
+	    $query = "SELECT * FROM " . static::$table . " WHERE " . self::getTableDef()->getPrimaryKey() . " = '" . self::getDb()->escape($id) . "'";
+	    return self::getDb()->queryrow($query);
     }
 
     /**
@@ -131,7 +155,7 @@ class collection_base {
         if ( $limit !== false && is_numeric($limit)){
             $query .= " LIMIT " . $limit;
         }
-        return self::getDb()->query($query);
+        return self::getwDb()->query($query);
     }
 
     /**
@@ -149,7 +173,7 @@ class collection_base {
         while ( $row = self::getDb()->fetchRow($results) ){
             $rows[] = $row;
         }
-        return $rows;
+        return !empty($rows) ? $rows : false;
     }
 
     /**
@@ -175,5 +199,12 @@ class collection_base {
      */
     public static function setDbConnection(db $dbConnection){
         static::$db = $dbConnection;
+    }
+
+    /**
+     * @param db $dbConnection
+     */
+    public static function setwDbConnection(db $dbConnection){
+        static::$wDb = $dbConnection;
     }
 }
