@@ -218,6 +218,10 @@ class db {
 	public function seek($offset){
 	    mysqli_data_seek($this->result, $offset);
     }
+
+    public function escapeField($field){
+        return '`' . implode('`.`', explode('.', $field)) . '`';
+    }
 }
 
 ?>

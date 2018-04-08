@@ -119,6 +119,7 @@ class collection_base {
 
         if ( !empty($sets) ){
             $query = "UPDATE " . static::$table . " SET " . implode(",",$sets) . " WHERE " . $keyField . " = '" . self::getDb()->escape($id) . "'";
+            debugLog($query);
             if ( self::getwDb()->query($query) ){
                 return true;
             }

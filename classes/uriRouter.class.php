@@ -14,8 +14,9 @@ class uriRouter {
      * @param int $requirePermission
      */
 	public static function routeAdd($uri,$controller,$view = null, $requireAuthentication = false, $requirePermission = null){
-		if ( empty($view) )
+		if ( $view === null ){
 			$view = $controller;
+        }
 
 		$newRoute = array();
 		//$uri = str_replace("/","\/",$uri);
@@ -91,7 +92,7 @@ class uriRouter {
 					@include(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
 				}
 
-				if ( $sRoute['view'] != null ){
+				if ( !empty($sRoute['view']) ){
 					if ( file_exists($view_dir . DIRECTORY_SEPARATOR . "header.inc.php") && defined('NO_HEADER') !== true )
 						include($view_dir . DIRECTORY_SEPARATOR . "header.inc.php");
 

@@ -277,6 +277,12 @@ abstract class model_base {
     public function getError(){
         return $this->lastError;
     }
+
+    public function NewQuery(){
+        $q = new Query();
+        $q->addTable($this->getTable());
+        return $q;
+    }
 }
 
 ?>
