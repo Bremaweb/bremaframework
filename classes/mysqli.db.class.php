@@ -220,7 +220,13 @@ class db {
     }
 
     public function escapeField($field){
-        return '`' . implode('`.`', explode('.', $field)) . '`';
+	    $field = str_replace('`','',$field);
+	    $parts = explode(' as ', strtolower($field));
+        $eField = '`' . implode('`.`', explode('.', trim($parts[0]))) . '`';
+        if ( !empty($parts[1]) ){
+            $eField .= ' AS ' . $this->escapeField(trim($parts[1]));
+        }
+        return $eField;
     }
 }
 

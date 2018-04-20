@@ -45,6 +45,7 @@ class authentication {
 				static::$user->load($_SESSION['user_id']);
 			}
 
+			/*
 			if ( !empty($_SESSION['expires']) ){
 				if ( $_SESSION['expires'] < time() && $_COOKIE["{$slic}"] != static::$user->getKeyValue() ){
 					session_destroy();
@@ -53,7 +54,9 @@ class authentication {
 				}
 			}
 
+
 			$_SESSION['expires'] = ( time() + 86400 );
+			*/
 			return true;
 		}
 	}

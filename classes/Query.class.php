@@ -19,7 +19,7 @@ class Query {
         }
 
         if ( !empty($table) ){
-            $this->AddTable($table);
+            $this->addTable($table);
         }
     }
 
@@ -27,11 +27,11 @@ class Query {
         return $this->GetQuery();
     }
     
-    public function GetQuery(){
+    public function getQuery(){
         return $this->RenderQuery();   
     }
     
-    private function RenderQuery(){
+    private function renderQuery(){
         $this->_query  = $this->RenderFields();
         $this->_query .= $this->RenderTables();
         if ( !empty($this->params) ){
@@ -44,10 +44,10 @@ class Query {
         return $this->_query;
     }
 
-    private function RenderFields(){
+    private function renderFields(){
         if ( !empty($this->fields) ){
             if ( is_array($this->fields) ){
-                return 'SELECT ' . implode(',', array_map(function($f){ return $this->db->escapeField($f); },$this->fields));
+                return 'SELECT ' . implode(',', array_map(function($f){ return strpos($f,'!') === 0 ? substr($f,1) : $this->db->escapeField($f); },$this->fields));
             } else {
                 return 'SELECT ' . $this->db->escapeField($this->fields);
             }
@@ -56,7 +56,7 @@ class Query {
         }
     }
     
-    private function RenderTables(){
+    private function renderTables(){
         $tables = " FROM ";
         $i = 0;
         foreach ( $this->tables as $table ){
@@ -66,7 +66,7 @@ class Query {
                     if ( !empty($table['params'] && !empty($table['join']) ) ){
                         $joinType = !empty($table['join']) ? $table['join'] : 'LEFT';
                         $tables .= " {$joinType} JOIN " . $table['name'];
-                        $tables .= " ON " . $this->RenderParams($table['params']);
+                        $tables .= " ON " . $this->renderParams($table['params']);
                     } else {
                         $tables .= ", " . $table['name'];
                     }
@@ -86,7 +86,7 @@ class Query {
         return $tables;
     }
     
-    private function RenderParams($params){
+    private function renderParams($params){
 
         $paramString = '';
         $format = "%s %s %s %s";
@@ -94,13 +94,15 @@ class Query {
         $i = 0;
         foreach ( $params as $field => $value ){
             if ( !empty($value['or']) ){
+                $i++;
                 $e = 0;
                 $paramString .= " ( ";
                 foreach ( $value['or'] as $orFields ){
                     foreach ( $orFields as $f => $v ){
                         list($o, $v) = $this->getOperatorAndValue($v);
                         $c = $e > 0 ? " OR " : "";
-                        $paramString .= sprintf($format, $c, $this->db->escapeField($f), $o, $v);
+                        $eField = strpos($f, '!') === 0 ? substr($f,1) : $this->db->escapeField($f);
+                        $paramString .= sprintf($format, $c, $eField, $o, $v);
                     }
                     $e++;
                 }
@@ -108,7 +110,8 @@ class Query {
             } else {
                 list($operator, $value) = $this->getOperatorAndValue($value);
                 $a = $i > 0 ? " AND " : "";
-                $paramString .= sprintf($format, $a, $this->db->escapeField($field), $operator, $value);
+                $eField = strpos($field, '!') === 0 ? substr($field,1) : $this->db->escapeField($field);
+                $paramString .= sprintf($format, $a, $eField, $operator, $value);
                 $i++;
             }
         }
@@ -151,37 +154,37 @@ class Query {
         return array($operator, $value);
     }
 
-    private function RenderOrder(){
+    private function renderOrder(){
         if ( !empty($this->order) ){
             return " ORDER BY " . $this->db->escape($this->order);
         }
         return '';
     }
 
-    private function RenderLimit(){
+    private function renderLimit(){
         if ( !empty($this->limit) && is_numeric($this->limit) ){
             return " LIMIT " . $this->limit;
         }
         return '';
     }
     
-    public function SetFields($fields){
+    public function setFields($fields){
        $this->fields = $fields;
     }
     
-    public function AddTable($table){
+    public function addTable($table){
         $this->tables[] = $table;
     }
 
-    public function SetParams($params){
+    public function setParams($params){
         $this->params = $params;
     }
 
-    public function SetOrder($order){
+    public function setOrder($order){
         $this->order = $order;
     }
     
-    public function SetLimit($limit){
+    public function setLimit($limit){
         $this->limit = $limit;
     }
 

@@ -42,10 +42,15 @@ class permissions {
 	}
 
     /**
-     * @return array
+     * @param null $group
+     * @return array|mixed
      */
-	public static function getAll(){
-		return self::$_perms;
+	public static function getAll($group = null){
+	    if ( empty($group) ){
+		    return self::$_perms;
+        } else {
+	        return self::$_permGroups[$group];
+        }
 	}
 
     /**
@@ -55,5 +60,3 @@ class permissions {
 	    return self::$_nextNumber;
     }
 }
-
-?>

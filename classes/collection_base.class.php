@@ -11,7 +11,7 @@ class collection_base {
     /**
      * @return db
      */
-	protected static function getDb(){
+	public static function getDb(){
 		if ( empty(static::$db) ){
 			static::$db = dbConnection::getConnection(static::$dbConnectionName);
 		}
@@ -21,7 +21,7 @@ class collection_base {
     /**
      * @return db
      */
-	protected static function getwDb(){
+	public static function getwDb(){
         if ( empty(static::$wDb) ){
             if ( dbConnectionsDef::hasMasterConnection() ){
                 static::$wDb = dbConnection::getConnection(dbConnectionsDef::getMasterConnectionId());
@@ -46,7 +46,7 @@ class collection_base {
     /**
      * @return string
      */
-	protected static function getTable(){
+	public static function getTable(){
         if ( static::$table === null ){
             static::$table = str_replace("Collection","",get_called_class());
         }
@@ -95,7 +95,8 @@ class collection_base {
 				$values[] = self::getwDb()->escape($value);
 			}
 		}
-		$query = "INSERT INTO " . static::$table . " (" . implode(",",$fields) . ") values('" . implode("','", $values) . "');";
+		$query = "INSERT INTO " . self::getTable() . " (" . implode(",",$fields) . ") values('" . implode("','", $values) . "');";
+
 		if ( self::getwDb()->query($query) ){
 		    return self::getwDb()->lastid();
         }
