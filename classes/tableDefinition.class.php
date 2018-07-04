@@ -16,22 +16,26 @@ class tableDefinition {
 	    if ( false === $cachedDef = cache::get('tableDef:' . $this->table) ){
             $query = "DESCRIBE " . $this->table;
             $results = $this->db->query($query);
-            while ( $row = $this->db->fetchrow($results) ){
-                $this->tableDef[$row['Field']] = $row;
-                if ( $row['Key'] == 'PRI' ){
-                    $this->primaryKey = $row['Field'];
-                }
-                if ( substr($row['Type'],0,4) == 'enum' ){
-                    $vals = substr($row['Type'],6,strlen($row['Type'])-8);
-                    $vals = explode('\',\'', $vals);
-                    $vResults = array();
-                    foreach ( $vals as $val ){
-                        $vResults[] = array('text' => ucwords($val), 'value' => $val);
+            if ( $results ){
+                while ( $row = $this->db->fetchrow($results) ){
+                    $this->tableDef[$row['Field']] = $row;
+                    if ( $row['Key'] == 'PRI' ){
+                        $this->primaryKey = $row['Field'];
                     }
-                    $this->tableDef[$row['Field']]['enum_vals'] = $vResults;
+                    if ( substr($row['Type'],0,4) == 'enum' ){
+                        $vals = substr($row['Type'],6,strlen($row['Type'])-8);
+                        $vals = explode('\',\'', $vals);
+                        $vResults = array();
+                        foreach ( $vals as $val ){
+                            $vResults[] = array('text' => ucwords($val), 'value' => $val);
+                        }
+                        $this->tableDef[$row['Field']]['enum_vals'] = $vResults;
+                    }
                 }
+                cache::set('tableDef:' . $this->table, array('fields' => $this->tableDef, 'key' => $this->primaryKey), 86400);
+            } else {
+                throw new Exception('Unable to load table definition');
             }
-            cache::set('tableDef:' . $this->table, array('fields' => $this->tableDef, 'key' => $this->primaryKey), 86400);
         } else {
             $this->tableDef = $cachedDef['fields'];
             $this->primaryKey = $cachedDef['key'];

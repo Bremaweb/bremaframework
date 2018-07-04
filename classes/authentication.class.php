@@ -5,10 +5,18 @@ class authentication {
 
 	public static function initUser(){
 		if ( session_status() !== PHP_SESSION_ACTIVE ){
+		    if ( !file_exists(APP_DIR . 'cache/session') ){
+		        mkdir(APP_DIR . 'cache/session');
+            }
+            session_save_path(APP_DIR . 'cache/session');
 			session_set_cookie_params( (86400 * 90) );
 			session_start();
         }
-		static::$user = new user(!empty($_SESSION['user_id']) ? $_SESSION['user_id'] : '');
+        if ( empty($_SESSION['user_id']) && !empty($_COOKIE[STAY_LOGGED_IN_COOKIE]) ){
+		    static::$user = new user($_COOKIE[STAY_LOGGED_IN_COOKIE], true);
+        } else {
+		    static::$user = new user(!empty($_SESSION['user_id']) ? $_SESSION['user_id'] : '');
+        }
 	}
 
     /**
@@ -36,7 +44,7 @@ class authentication {
 
 	public static function authenticate(){
 		$slic = STAY_LOGGED_IN_COOKIE;
-		if ( static::$user->logged_in == false && ( !isset($_COOKIE["{$slic}"]) || $_COOKIE["{$slic}"] != static::$user->getKeyValue() ) ){
+		if ( static::$user->logged_in == false && ( !isset($_COOKIE["{$slic}"]) || $_COOKIE["{$slic}"] != static::$user->guid ) ){
 			header("location: " . LOGIN_URL . "?redirect=" . $_SERVER['REQUEST_URI']);
 			return false;
 		} else {
@@ -57,6 +65,7 @@ class authentication {
 
 			$_SESSION['expires'] = ( time() + 86400 );
 			*/
+			//$_SESSION['logged_in'] = true;
 			return true;
 		}
 	}
@@ -75,6 +84,7 @@ class authentication {
 				}
 			}
 			$_SESSION['user_id'] = $row['pkey'];
+			//$_SESSION['logged_in'] = true;
 			static::$user->logged_in = true;
 			return true;
 		} else {
@@ -89,5 +99,6 @@ class authentication {
 		session_destroy();
 		unset($_SESSION);
 		$_SESSION = array();
+		setcookie(STAY_LOGGED_IN_COOKIE,null,0);
 	}
 }

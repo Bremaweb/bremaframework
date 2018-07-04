@@ -59,4 +59,8 @@ class permissions {
 	public static function getMax(){
 	    return self::$_nextNumber;
     }
+
+    public static function humanReadable($permName){
+        return ucwords(str_replace('_',' ',$permName));
+    }
 }

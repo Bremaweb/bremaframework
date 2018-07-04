@@ -25,4 +25,3 @@ if ( !defined('NO_USER') ){
 
 @include_once(APP_DIR . "/includes/app_init.php");
 
-?>

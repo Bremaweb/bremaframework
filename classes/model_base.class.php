@@ -43,6 +43,7 @@ abstract class model_base {
 
 		if ( $_key != "" ){
 			if ( !$this->load($_key,$isGuid) ){
+			    throw new Exception('Unable to load new ' . get_class($this));
 				return false;
 			}
 		}

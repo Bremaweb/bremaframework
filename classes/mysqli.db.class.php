@@ -95,8 +95,9 @@ class db {
 	function getRows($SQL,$optionArray=false){
 		$results = $this->query($SQL);
 
-		if ( !$results )
+		if ( !$results ){
 			return false;
+        }
 
 		$returnRows = array();
 		while ( $row = $this->fetcharray($results) ){
