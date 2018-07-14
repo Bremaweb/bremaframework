@@ -43,7 +43,7 @@ function html_select($aryParams) {
 				}
 			}
 
-			if ( is_array($o['attrib']) ) {
+			if ( !empty($o['attrib']) && is_array($o['attrib']) ) {
 				foreach ( $o['attrib'] as $kk => $vv )
 					$attribs .= " $kk=\"$vv\"";
 			}

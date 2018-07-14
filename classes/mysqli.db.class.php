@@ -4,6 +4,7 @@ class db {
 
     private $result = "";
 	private $_dbconn;
+	private $lastError = null;
 
     /**
      * db constructor.
@@ -15,8 +16,13 @@ class db {
      */
     function __construct($host, $port, $database, $user, $password){	// original parameters ($dbHost,$dbPort,$dbDatabase,$dbUser,$dbPassword)
     	    $this->_dbconn = mysqli_connect($host,$user,$password,$database,$port);
-			if ( !$this->_dbconn )
+			if ( !$this->_dbconn ){
 				die("Unable to connect to database..." . mysqli_error($this->_dbconn));
+            }
+    }
+
+    function getError(){
+        return $this->lastError . " (" . get_class($this) . ")";
     }
 
     /**
@@ -28,6 +34,7 @@ class db {
         $this->result = @mysqli_query($this->_dbconn, $SQL);
 
         if (!$this->result){
+            $this->lastError = mysqli_error($this->_dbconn) . " - " . $SQL;
         	debugLog(mysqli_error($this->_dbconn),1);
             debugLog($SQL,1);
         }
@@ -47,12 +54,12 @@ class db {
                 return $this->fetchrow($result);
                 @mysqli_free_result($result);
             }else{
+                $this->lastError = mysqli_error($this->_dbconn) . " - " . $SQL;
                 return false;
             }
     }
 
     function fetchrow($result = 0){
-
         if (!$result)
             $result = $this->result;
 
@@ -96,6 +103,7 @@ class db {
 		$results = $this->query($SQL);
 
 		if ( !$results ){
+            $this->lastError = mysqli_error($this->_dbconn) . " - " . $SQL;
 			return false;
         }
 
@@ -130,10 +138,12 @@ class db {
         $SQL .= ")";
 
         $results = $this->query($SQL);
-        if ( $results )
+        if ( $results ){
             return mysqli_insert_id();
-        else
+        } else {
+            $this->lastError = mysqli_error($this->_dbconn);
             return false;
+        }
     }
 
 	function getRow ($table, $columns, $key, $keyValue ){
@@ -164,20 +174,18 @@ class db {
 				$keyValue = $v;
 			}
         }
-        //$SQL = substr($SQL,0,strlen($SQL)-1);
-        //$SQLv = substr($SQLv,0,strlen($SQLv)-1);
-
-        //$SQL .= ") values(" . $SQLv . ")";
 
         $SQL = rtrim($SQL,",");
 
         $SQL .= " WHERE $key = '" . $this->escape($keyValue) . "'";
 
         $results = $this->query($SQL);
-        if ( $results )
+        if ( $results ){
             return $keyValue;
-        else
+        } else {
+            $this->lastError = mysqli_error($this->_dbconn);
             return false;
+        }
     }
 
 	function getTableCols($table,$include_ai=true){

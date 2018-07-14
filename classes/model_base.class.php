@@ -63,8 +63,9 @@ abstract class model_base {
 		if ( $this->loaded == true ){
 			$retVal = $this->wDb->updateRow($this->table, $this->data, $this->key, $this->id);
 		} else {
-			if ( $this->wDb->insertRow($this->table, $this->data) !== false )
+			if ( $this->wDb->insertRow($this->table, $this->data) !== false ){
 				$this->loaded = true;
+            }
 			//$this->data["{$this->key}"] = $this->db->lastid();
 			$retVal = $this->wDb->lastid();
 			$this->id = $retVal;
@@ -276,7 +277,11 @@ abstract class model_base {
     }
 
     public function getError(){
-        return $this->lastError;
+        if ( !empty($this->lastError) ){
+            return $this->lastError . " (" . get_class($this) . ")";
+        } else {
+            return $this->db->getError();
+        }
     }
 
     public function NewQuery(){

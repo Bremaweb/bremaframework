@@ -5,6 +5,7 @@ class permissions {
 	private static $_permById = array();
 	private static $_permGroups = array();
 	private static $_nextNumber = 1;
+	private static $_permDefault = false;
 
     /**
      * @param int $id
@@ -13,6 +14,10 @@ class permissions {
 	public static function getById($id){
 		return self::$_permById[$id];
 	}
+
+	public static function setDefault($def){
+	    static::$_permDefault = !empty($def);
+    }
 
     /**
      * @param string $key
@@ -34,11 +39,11 @@ class permissions {
 
     /**
      * @param string $name
-     * @return mixed
+     * @return bool
      */
 	public static function get($name){
 	    $name = strtolower($name);
-		return self::$_perms[$name];
+		return !empty(self::$_perms[$name]) ? self::$_perms[$name] : self::$_permDefault;
 	}
 
     /**
