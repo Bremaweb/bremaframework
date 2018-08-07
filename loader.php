@@ -5,8 +5,16 @@ try {
     $autoloader = new ClassAutoLoader();
 
     // INCLUDE APPLICATION FILES
-    @include_once(APP_DIR . "/config/db_config.php");
-    @include_once(APP_DIR . "/config/mail_config.php");
+    if ( IS_LOCALHOST && file_exists(APP_DIR . '/config/local') ){
+        $confDir = APP_DIR . '/config/local/';
+    } elseif ( file_exists(APP_DIR . '/config/production') ) {
+        $confDir = APP_DIR . '/config/production/';
+    } else {
+        $confDir = APP_DIR . '/config/';
+    }
+
+    @include_once($confDir . "db_config.php");
+    @include_once($confDir . "mail_config.php");
     @include_once(APP_DIR . "/includes/functions.php");
 
     // INCLUDE BREMA FRAMEWORK FILES
