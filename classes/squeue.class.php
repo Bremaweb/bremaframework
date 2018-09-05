@@ -5,7 +5,7 @@ class squeue {
 
 	private $type = "";
 
-	private function __construct($type){
+	public function __construct($type){
 		$this->type = $type;
 	}
 

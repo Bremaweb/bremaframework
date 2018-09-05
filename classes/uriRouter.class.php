@@ -84,22 +84,26 @@ class uriRouter {
 					&& ( file_exists(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php")
 					|| file_exists(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php") )  ){
 
-				@include(APP_DIR . "/includes/scripts.php");
+			    // removed should be included using app_init or something like that
+				//include(APP_DIR . "/includes/scripts.php");
 
-				$r = @include(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
+				$r = include(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
 
 				if ( $r != 1 ){
-					@include(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
+					include(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
 				}
 
+				debugLog($sRoute['view']);
 				if ( !empty($sRoute['view']) ){
-					if ( file_exists($view_dir . DIRECTORY_SEPARATOR . "header.inc.php") && defined('NO_HEADER') !== true )
+					if ( file_exists($view_dir . DIRECTORY_SEPARATOR . "header.inc.php") && defined('NO_HEADER') !== true ){
 						include($view_dir . DIRECTORY_SEPARATOR . "header.inc.php");
+                    }
 
 					include($view_dir . "/" . $sRoute['view'] . ".view.php");
 
-					if ( file_exists($view_dir . DIRECTORY_SEPARATOR . "footer.inc.php") && defined('NO_FOOTER') !== true )
+					if ( file_exists($view_dir . DIRECTORY_SEPARATOR . "footer.inc.php") && defined('NO_FOOTER') !== true ){
 						include($view_dir . DIRECTORY_SEPARATOR . "footer.inc.php");
+                    }
 				}
 
 			} else {
