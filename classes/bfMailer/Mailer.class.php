@@ -12,10 +12,10 @@ class Mailer {
         if ( class_exists($className) ){
             $this->interface = new $className();
             if ( false === $this->interface->init($def['params']) ){
-                throw new Exception('Unable to initialize mailer interface: ' . $this->interface->getError());
+                throw new \Exception('Unable to initialize mailer interface: ' . $this->interface->getError());
             }
         } else {
-            throw new Exception('Unable to find mailer interface ' . $def['mailer']);
+            throw new \Exception('Unable to find mailer interface ' . $def['mailer']);
         }
     }
 
