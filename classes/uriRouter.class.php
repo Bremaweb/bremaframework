@@ -93,7 +93,6 @@ class uriRouter {
 					include(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
 				}
 
-				debugLog($sRoute['view']);
 				if ( !empty($sRoute['view']) ){
 					if ( file_exists($view_dir . DIRECTORY_SEPARATOR . "header.inc.php") && defined('NO_HEADER') !== true ){
 						include($view_dir . DIRECTORY_SEPARATOR . "header.inc.php");

@@ -22,9 +22,7 @@ class Messenger {
      * @return bool|mixed
      */
     public function getProfile($uid, $fields = 'first_name,last_name,profile_pic'){
-        debugLog($uid);
         $profile = $this->_executeRequest($uid . '?fields=' . $fields);
-        debugLog($profile);
         return $profile;
     }
 
@@ -97,7 +95,6 @@ class Messenger {
      */
     private function _executeRequest($endPoint, $data = null, $method = 'get'){
         $url = $this->_buildUrl($endPoint);
-        debugLog($url);
         if ( !empty($data) ){
             $data_string = json_encode($data);
         }
@@ -121,13 +118,9 @@ class Messenger {
             );
         }
 
-        debugLog($ch);
-
         $result = json_decode(curl_exec($ch),true);
-        debugLog($result);
 
         $httpres = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        debugLog($httpres);
 
         if ( $httpres == '200' ){
             return $result;

@@ -7,7 +7,6 @@ try {
     // INCLUDE BREMA FRAMEWORK FILES
     require_once(BREMA_DIR . "/functions.php");
     require_once(BREMA_DIR . "/html_helpers.php");
-    debugLog('including framework files finished');
 
     // INCLUDE APPLICATION FILES
     if ( !defined('IS_LOCALHOST') ){
@@ -22,15 +21,9 @@ try {
         $confDir = APP_DIR . 'config/';
     }
 
-    debugLog('Including app config files');
     @include_once($confDir . "db_config.php");
     @include_once($confDir . "mail_config.php");
     @include_once(APP_DIR . "includes/functions.php");
-    debugLog('including app config files complete');
-
-
-
-    debugLog($confDir);
 
     // static routes can be configured in a config/routes.php file or routes can be setup dynamically in the application
     if ( defined('ROUTE_FILE') !== false ){
@@ -43,11 +36,8 @@ try {
         authentication::initUser();
     }
 
-    debugLog('app_init');
     @include_once(APP_DIR . "includes/app_init.php");
-    debugLog('app_init finished');
 } catch ( Exception $caughtException ){
     include(BREMA_DIR . 'error.php');
-    debugLog($caughtException->getMessage());
 }
 

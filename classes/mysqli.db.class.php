@@ -35,8 +35,6 @@ class db {
 
         if (!$this->result){
             $this->lastError = mysqli_error($this->_dbconn) . " - " . $SQL;
-        	debugLog(mysqli_error($this->_dbconn),1);
-            debugLog($SQL,1);
         }
 
         return $this->result;
