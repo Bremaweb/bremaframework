@@ -147,7 +147,7 @@ class Query {
                     $value = implode(" AND ", array_map(function($x) { return stripos($x, '@') === 0 ? $this->db->escapeField(ltrim($x,'@')) : "'" . $this->db->escape($x) . "'"; }, $value));
                 break;
             default:
-                $value = stripos($value, "@") === 0 ? $this->db->escapeField(ltrim($value,'@')) : "'" . $this->db->escape($value) . "'";
+                $value = stripos($value, "@") === 0 ? ltrim($value, '@') : "'" . $this->db->escape($value) . "'";
                 break;
         }
 

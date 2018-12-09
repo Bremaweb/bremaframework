@@ -93,6 +93,26 @@ class authentication {
 		}
 	}
 
+	public static function loginByKey($key){
+        if ( false !== $keyData = AuthKeys::getByKey($key) ){
+            static::$user->load($keyData['user_id']);
+            if ( in_array("user_verified",static::$user->getColumns()) ){
+                if ( static::$user->user_verified != 1 ){
+                    $_SESSION['error'] = "Email address not verified";
+                    static::$user->logged_in = false;
+                    return false;
+                }
+            }
+            $_SESSION['user_id'] = $keyData['user_id'];
+            //$_SESSION['logged_in'] = true;
+            static::$user->logged_in = true;
+            return true;
+        } else {
+            static::$user->logged_in = false;
+            return false;
+        }
+    }
+
 	public static function logout(){
 		static::$user->logged_in = false;
 

@@ -10,8 +10,8 @@ abstract class model_base {
 	protected $table = null;
 	protected $key = null;
 	protected $dbConnectionName = 'default';
+	protected $data = array();
 
-	private $data = array();
 	private $tableDefinition;
 	private $instanceGUID;
 	private $lastError = null;

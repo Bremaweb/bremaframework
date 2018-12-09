@@ -187,15 +187,19 @@ class db {
     }
 
 	function getTableCols($table,$include_ai=true){
-		$retVal = array();
-		$SQL = "SHOW FIELDS FROM $table";
-		$results = $this->query($SQL);
-		while ( $row = $this->fetchrow($results) ){
-			if ( $include_ai == false && $row['Extra'] == "auto_increment" )
-				continue;
+        if ( false === $retVal = cache::get('getTableCols::' . $table) ){
+            $retVal = array();
+            $SQL = "SHOW FIELDS FROM $table";
+            $results = $this->query($SQL);
+            while ( $row = $this->fetchrow($results) ){
+                if ( $include_ai == false && $row['Extra'] == "auto_increment" )
+                    continue;
 
-			$retVal[] = $row['Field'];
-		}
+                $retVal[] = $row['Field'];
+            }
+
+            cache::set('getTableCols::' . $table, $retVal);
+        }
 
 		return $retVal;
 	}

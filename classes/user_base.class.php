@@ -48,7 +48,7 @@ abstract class user_base extends model_base {
     }
 
     public function getPermissions(){
-	    return 0;
+	    return $this->user_permissions;
     }
 
     public function hasPermission($permName){
