@@ -37,6 +37,10 @@ class dbConnection {
      * @return dbConnection[]
      */
 	public static function getAllConnections(){
-	    return self::$instance;
+	    $retVal = array();
+	    foreach ( self::$instance as $conn ){
+            $retVal[] = $conn->connection;
+        }
+	    return $retVal;
     }
 }
