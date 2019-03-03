@@ -32,4 +32,11 @@ class dbConnection {
 		}
 		return self::$instance[$connName]->connection;
 	}
+
+    /**
+     * @return dbConnection[]
+     */
+	public static function getAllConnections(){
+	    return self::$instance;
+    }
 }

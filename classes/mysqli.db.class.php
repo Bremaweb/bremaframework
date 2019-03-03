@@ -19,6 +19,10 @@ class db {
 			if ( !$this->_dbconn ){
 				die("Unable to connect to database..." . mysqli_error($this->_dbconn));
             }
+
+            if ( registry::get('_TIMEZONE') ){
+			    $this->query("SET time_zone = '" . registry::get('_TIMEZONE') . "'");
+            }
     }
 
     function getError(){
