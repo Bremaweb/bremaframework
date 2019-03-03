@@ -25,10 +25,15 @@ abstract class model_base {
         $this->instanceGUID = md5($this->table . $_key);
 
 		$this->db = dbConnection::getConnection(!empty($connectionName) ? $connectionName : $this->dbConnectionName);
-		if ( dbConnectionsDef::hasMasterConnection() ){
+        if ( dbConnectionsDef::hasMasterConnection() ){
 		    $this->wDb = dbConnection::getConnection(dbConnectionDef::getMasterConnectionId());
         } else {
 		    $this->wDb = $this->db;
+        }
+
+        if ( registry::get('_TIMEZONE') ){
+            $this->db->query("SET time_zone = '" . registry::get('_TIMEZONE') . "'");
+            $this->wDb->query("SET time_zone = '" . registry::get('_TIMEZONE') . "'");
         }
 
 		if ( empty($this->table) ){
@@ -47,6 +52,7 @@ abstract class model_base {
 				return false;
 			}
 		}
+
 		$this->afterConstruct($_key,$isGuid);
 	}
 

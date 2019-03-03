@@ -15,14 +15,10 @@ class db {
      * @param $password
      */
     function __construct($host, $port, $database, $user, $password){	// original parameters ($dbHost,$dbPort,$dbDatabase,$dbUser,$dbPassword)
-    	    $this->_dbconn = mysqli_connect($host,$user,$password,$database,$port);
-			if ( !$this->_dbconn ){
-				die("Unable to connect to database..." . mysqli_error($this->_dbconn));
-            }
-
-            if ( registry::get('_TIMEZONE') ){
-			    $this->query("SET time_zone = '" . registry::get('_TIMEZONE') . "'");
-            }
+        $this->_dbconn = mysqli_connect($host,$user,$password,$database,$port);
+        if ( !$this->_dbconn ){
+            die("Unable to connect to database..." . mysqli_error($this->_dbconn));
+        }
     }
 
     function getError(){
