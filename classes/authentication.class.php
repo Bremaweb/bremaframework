@@ -12,10 +12,18 @@ class authentication {
 			session_set_cookie_params( (86400 * 90) );
 			session_start();
         }
+
         if ( empty($_SESSION['user_id']) && !empty($_COOKIE[STAY_LOGGED_IN_COOKIE]) ){
 		    static::$user = new user($_COOKIE[STAY_LOGGED_IN_COOKIE], true);
         } else {
 		    static::$user = new user(!empty($_SESSION['user_id']) ? $_SESSION['user_id'] : '');
+        }
+
+        if ( value($_GET, 'key')  ){
+            if ( authentication::loginByGUID(value($_GET,'key')) ){
+                // remove the ?key and redirect
+                redirect($_SERVER['REDIRECT_URL']);
+            }
         }
 	}
 
@@ -44,6 +52,7 @@ class authentication {
 
 	public static function authenticate(){
 		$slic = STAY_LOGGED_IN_COOKIE;
+
 		if ( static::$user->logged_in == false && ( !isset($_COOKIE["{$slic}"]) || $_COOKIE["{$slic}"] != static::$user->guid ) ){
 			header("location: " . LOGIN_URL . "?redirect=" . $_SERVER['REQUEST_URI']);
 			return false;
@@ -92,6 +101,29 @@ class authentication {
 			return false;
 		}
 	}
+
+    public static function loginByGUID($guid){
+        $SQL = "SELECT " . static::$user->getKey() . " as pkey FROM users WHERE guid = '" . $guid . "'";
+        $r = static::$user->db->query($SQL);
+        if ( static::$user->db->numrows($r) > 0 ){
+            $row = static::$user->db->fetchrow($r);
+            static::$user->load($row['pkey']);
+            if ( in_array("user_verified",static::$user->getColumns()) ){
+                if ( static::$user->user_verified != 1 ){
+                    $_SESSION['error'] = "Email address not verified";
+                    static::$user->logged_in = false;
+                    return false;
+                }
+            }
+            $_SESSION['user_id'] = $row['pkey'];
+            //$_SESSION['logged_in'] = true;
+            static::$user->logged_in = true;
+            return true;
+        } else {
+            static::$user->logged_in = false;
+            return false;
+        }
+    }
 
 	public static function loginByKey($key){
         if ( false !== $keyData = AuthKeys::getByKey($key) ){
