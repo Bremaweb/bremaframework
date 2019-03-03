@@ -137,7 +137,7 @@ class db {
 
         $results = $this->query($SQL);
         if ( $results ){
-            return mysqli_insert_id();
+            return mysqli_insert_id($this->_dbconn);
         } else {
             $this->lastError = mysqli_error($this->_dbconn);
             return false;
