@@ -34,7 +34,7 @@ class tableDefinition {
                 }
                 cache::set('tableDef:' . $this->table, array('fields' => $this->tableDef, 'key' => $this->primaryKey), 86400);
             } else {
-                throw new Exception('Unable to load table definition');
+                throw new Exception('Unable to load table definition. ' . $query);
             }
         } else {
             $this->tableDef = $cachedDef['fields'];

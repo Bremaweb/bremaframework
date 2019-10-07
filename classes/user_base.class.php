@@ -55,6 +55,9 @@ abstract class user_base extends model_base {
         return (( $this->getPermissions() & permissions::get($permName) ) == permissions::get($permName));
     }
 
+    public function getTimezone(){
+        return !empty($this->timezone) ? $this->timezone : date_default_timezone_get();
+    }
 }
 
 ?>

@@ -4,10 +4,10 @@
 
 function html_select($aryParams) {
 
-	$selName = $aryParams['name'];
-	$attributes = $aryParams['attributes'];
-	$selected = $aryParams['selected'];
-	$options = $aryParams['options'];
+	$selName = value($aryParams,'name');
+	$attributes = value($aryParams, 'attributes');
+	$selected = value($aryParams, 'selected');
+	$options = value($aryParams, 'options');
 
 	$retVal = "<select name=\"$selName\" ";
 

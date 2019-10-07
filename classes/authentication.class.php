@@ -20,9 +20,11 @@ class authentication {
         }
 
         if ( value($_GET, 'key')  ){
-            if ( authentication::loginByGUID(value($_GET,'key')) ){
+            if ( authentication::loginByKey(value($_GET,'key')) ){
                 // remove the ?key and redirect
-                redirect($_SERVER['REDIRECT_URL']);
+                if ( !empty($_SESSION['REDIRECT_URL']) ){
+                    redirect($_SERVER['REDIRECT_URL']);
+                }
             }
         }
 	}
@@ -81,13 +83,16 @@ class authentication {
 
 	public static function login($username,$password){
 		$SQL = "SELECT " . static::$user->getKey() . " as pkey FROM users WHERE `" . static::$user->getUsernameField() . "` = '" . static::$user->db->escape( $username ) . "' AND " . static::$user->getPasswordField() . " = '" . static::$user->hashPassword($password) . "'";
+
 		$r = static::$user->db->query($SQL);
 		if ( static::$user->db->numrows($r) > 0 ){
 			$row = static::$user->db->fetchrow($r);
+
 			static::$user->load($row['pkey']);
+
 			if ( in_array("user_verified",static::$user->getColumns()) ){
 				if ( static::$user->user_verified != 1 ){
-					$_SESSION['error'] = "Email address not verified";
+					messages::error('User account is not verified');
 					static::$user->logged_in = false;
 					return false;
 				}

@@ -87,19 +87,27 @@ class collection_base {
      * @return bool|int|null|string
      */
 	public static function add($data){
+	    profiler::startTimer('add');
 		$fields = array();
 		$values = array();
+		profiler::startTimer('addLoop');
 		foreach ( $data as $field => $value ){
 			if ( self::getTableDef()->fieldExists($field) && !in_array($field, $fields) ){
 				$fields[] = $field;
 				$values[] = self::getwDb()->escape($value);
 			}
 		}
+		profiler::stopTimer('addLoop');
 		$query = "INSERT INTO " . self::getTable() . " (" . implode(",",$fields) . ") values('" . implode("','", $values) . "');";
 
+        profiler::startTimer('addQuery', $query);
 		if ( self::getwDb()->query($query) ){
+		    profiler::stopTimer('add');
+		    profiler::stopTimer('addQuery');
 		    return self::getwDb()->lastid();
         }
+        profiler::stopTimer('add');
+        profiler::stopTimer('addQuery');
         return false;
 	}
 

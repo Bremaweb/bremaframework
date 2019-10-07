@@ -23,7 +23,7 @@ class AuthKeys extends collection_base {
         return false;
     }
 
-    public static function generateKey($userId, &$expires = null){
+    public static function generateKey($userId, &$expires = null, $length = 96){
         $expires = !empty($expires) ? $expires : date("Y-m-d H:i:s", strtotime('+90 Day'));
 
         $crypt = new boCrypt(md5(time()));
@@ -31,7 +31,7 @@ class AuthKeys extends collection_base {
 
         $pk = md5(microtime(true));
 
-        $key = substr('BOC64_' . $crypt->encrypt($pk, 100),0,255);
+        $key = substr('BOC64_' . $crypt->encrypt($pk, 100), 0, $length);
 
         self::add(array(
             'user_id' => $userId,
