@@ -82,7 +82,7 @@ class uriRouter {
 
 			if ( ( $sRoute['view'] == null || file_exists($view_dir . "/" . $sRoute['view'] . ".view.php") )
 					&& ( file_exists(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php")
-					|| file_exists(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php") )  ){
+					|| file_exists(BREMA_DIR . "controllers/" . $sRoute['controller'] . ".controller.php") )  ){
 
 			    // removed should be included using app_init or something like that
 				//include(APP_DIR . "/includes/scripts.php");
@@ -90,7 +90,7 @@ class uriRouter {
 				$r = include(APP_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
 
 				if ( $r != 1 ){
-					include(BREMA_DIR . "/controllers/" . $sRoute['controller'] . ".controller.php");
+					include(BREMA_DIR . "controllers/" . $sRoute['controller'] . ".controller.php");
 				}
 
 				if ( !empty($sRoute['view']) ){

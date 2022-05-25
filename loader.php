@@ -5,12 +5,16 @@ try {
     $autoloader = new ClassAutoLoader();
 
     // INCLUDE BREMA FRAMEWORK FILES
-    require_once(BREMA_DIR . "/functions.php");
-    require_once(BREMA_DIR . "/html_helpers.php");
+    require_once(BREMA_DIR . "functions.php");
+    require_once(BREMA_DIR . "html_helpers.php");
 
     // INCLUDE APPLICATION FILES
     if ( !defined('IS_LOCALHOST') ){
-        define('IS_LOCALHOST',false);
+        if ( file_exists(APP_DIR . 'localhost.txt') ){
+            define('IS_LOCALHOST',true);
+        } else {
+            define('IS_LOCALHOST',false);
+        }
     }
 
     if ( IS_LOCALHOST && file_exists(APP_DIR . 'config/local') ){

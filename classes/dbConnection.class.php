@@ -11,11 +11,11 @@ class dbConnection {
 	private function __construct($connName){
 		if ( dbConnectionsDef::defExists($connName) ){
 			$def = dbConnectionsDef::getConnectionDef($connName);
-			require_once(BREMA_DIR . "/classes/" . $def['dbType'] . ".db.class.php");
+			require_once(BREMA_DIR . "classes/" . $def['dbType'] . ".db.class.php");
 			$this->connection = new db($def['dbHost'],$def['dbPort'],$def['dbName'],$def['dbUser'],$def['dbPassword']);
 		} else {
 			// else fall back to the old behavior
-			require_once(BREMA_DIR . "/classes/" . DB_TYPE . ".db.class.php");
+			require_once(BREMA_DIR . "classes/" . DB_TYPE . ".db.class.php");
 			$this->connection = new db(DB_HOST,DB_PORT,DATABASE,DB_USER,DB_PASSWORD);
 		}
 	}

@@ -6,7 +6,7 @@ class cache {
 
 
     public static function get($key){
-        $cacheFile = APP_DIR . '/cache/' . md5($key);
+        $cacheFile = APP_DIR . 'cache/' . md5($key);
         if ( !empty(self::$caches[$key]) ){
             $cache = self::$caches[$key];
             if ( $cache['expires'] > time() ){
@@ -33,12 +33,12 @@ class cache {
         $cache = array("expires" => $cacheExpires, "value" => $value);
         self::$caches[$key] = $cache;
 
-        $cacheFile = APP_DIR . '/cache/' . md5($key);
+        $cacheFile = APP_DIR . 'cache/' . md5($key);
         return @file_put_contents($cacheFile, serialize($cache));
     }
 
     public static function invalidateCacheEntry($key){
-        $cacheFile = APP_DIR . '/cache/' . md5($key);
+        $cacheFile = APP_DIR . 'cache/' . md5($key);
         unset(self::$caches[$key]);
         unlink($cacheFile);
     }

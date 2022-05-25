@@ -31,7 +31,10 @@ class AuthKeys extends collection_base {
 
         $pk = md5(microtime(true));
 
-        $key = substr('BOC64_' . $crypt->encrypt($pk, 100), 0, $length);
+        $search  = array("+", "/", "\\");
+        $replace = array("P", "F", "B");
+
+        $key = str_replace($search, $replace, substr('BOC64_' . $crypt->encrypt($pk, 100), 0, $length));
 
         self::add(array(
             'user_id' => $userId,
